@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # AI ToolBox
 
 A curated collection of the most powerful AI tools, organized by category.
@@ -28,3 +29,6 @@ npm run build
 ```sh
 npm run preview
 ```
+=======
+A AI tool finding directory.
+>>>>>>> 5ab6b69a4ad2b293303b6ed72e118bb7d473b1cb
