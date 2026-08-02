@@ -4,428 +4,449 @@ export type Tool = {
   description: string;
   url: string;
   category: string;
-  icon?: string;
+  icon: string;
 };
 
 export type Category = {
   id: string;
   name: string;
   description: string;
-  icon?: string;
+  icon: string;
 };
 
 export const categories: Category[] = [
   {
     id: "text-generation",
     name: "Text Generation",
-    description: "Tools that generate human-like text for various purposes",
-    icon: "pen-line",
+    description: "Tools that generate and refine human-like text",
+    icon: "PenLine",
   },
   {
     id: "image-generation",
     name: "Image Generation",
-    description: "Tools that create images from text descriptions",
-    icon: "image",
+    description: "Tools that create and enhance images from text",
+    icon: "Image",
   },
   {
     id: "coding",
     name: "Coding",
     description: "AI assistants for writing, debugging, and understanding code",
-    icon: "code",
+    icon: "Code",
   },
   {
     id: "audio",
     name: "Audio & Speech",
     description: "Tools for creating and manipulating audio content",
-    icon: "mic",
+    icon: "Mic",
   },
   {
     id: "productivity",
     name: "Productivity",
-    description: "AI tools to boost workflow efficiency and productivity",
-    icon: "zap",
+    description: "Tools to boost workflow efficiency and productivity",
+    icon: "Zap",
   },
   {
     id: "research",
     name: "Research & Learning",
-    description: "Tools for information gathering and learning",
-    icon: "book-open",
+    description: "Tools for information gathering and skill development",
+    icon: "BookOpen",
+  },
+  {
+    id: "file-sharing",
+    name: "File Sharing",
+    description: "Secure and private file transfer solutions",
+    icon: "Share2",
+  },
+  {
+    id: "software-downloads",
+    name: "Software Downloads",
+    description: "Platforms for downloading software and applications",
+    icon: "Download",
+  },
+  {
+    id: "privacy",
+    name: "Privacy & Security",
+    description: "Tools for online privacy, security, and account management",
+    icon: "Shield",
+  },
+  {
+    id: "ui-ux-design",
+    name: "UI/UX Design",
+    description: "Design inspiration and UI component libraries",
+    icon: "Palette",
+  },
+  {
+    id: "creative",
+    name: "Creative",
+    description: "Creative tools for design, mockups, and media",
+    icon: "Sparkles",
   },
 ];
 
 export const tools: Tool[] = [
-  // File Sharing & Storage Tools
+  // File Sharing
   {
     id: "ToffeeShare",
     name: "ToffeeShare",
-    description: "Private & secure file transfer, without size limit",
+    description: "Private & secure file transfer without size limit",
     url: "https://toffeeshare.com/",
-    category: "File Sharing",
-    icon: "placeholder_icon_toffeeshare",
+    category: "file-sharing",
+    icon: "Share2",
   },
 
-  // Productivity Tools
+  // Productivity
   {
     id: "NeverInstall",
     name: "Never Install",
-    description: "Cloud-based application access",
+    description: "Cloud-based application access without local installation",
     url: "https://neverinstall.com/en-GB?ref=betalist",
     category: "productivity",
-    icon: "placeholder_icon_neverinstall",
+    icon: "Cloud",
+  },
+  {
+    id: "ResumeIO",
+    name: "Resume Builder · Resume.io",
+    description: "Online resume builder for professional CVs",
+    url: "https://resume.io/app/resumes/52725130/edit",
+    category: "productivity",
+    icon: "FileText",
+  },
+  {
+    id: "HiddenTools",
+    name: "Hidden Tools",
+    description: "Discover a curated collection of useful web tools",
+    url: "https://hiddentools.dev/",
+    category: "productivity",
+    icon: "Zap",
   },
 
-  // Software Download Platforms
+  // Software Downloads
   {
     id: "FileCR",
     name: "FileCR",
-    description: "The biggest software store",
+    description: "The biggest software store with a vast collection",
     url: "https://filecr.com/en/?id=94415884416",
-    category: "Software Downloads",
-    icon: "placeholder_icon_filecr",
+    category: "software-downloads",
+    icon: "Download",
   },
   {
     id: "4DOWNLOAD",
     name: "4DOWNLOAD",
-    description: "Software download platform",
+    description: "Software download platform with diverse applications",
     url: "https://4download.net/index.php",
-    category: "Software Downloads",
-    icon: "placeholder_icon_4download",
+    category: "software-downloads",
+    icon: "Download",
   },
   {
     id: "FreeSoftwareFiles",
     name: "Free Software Files",
     description: "Latest PC software reviews and free downloads",
     url: "https://www.freesoftwarefiles.com/",
-    category: "Software Downloads",
-    icon: "placeholder_icon_freesoftware",
+    category: "software-downloads",
+    icon: "Download",
   },
   {
     id: "ALLPCWorld",
     name: "ALL PC World",
-    description: "Free apps one click away",
+    description: "Free apps one click away for Windows",
     url: "https://allpcworld.com/",
-    category: "Software Downloads",
-    icon: "placeholder_icon_allpcworld",
+    category: "software-downloads",
+    icon: "Download",
   },
 
-  // Privacy & Security Tools
+  // Privacy & Security
   {
     id: "JustDeleteMe",
     name: "Just Delete Me",
-    description:
-      "A directory of direct links to delete your account from web services",
+    description: "Directory of direct links to delete accounts from web services",
     url: "https://justdeleteme.xyz/",
-    category: "Privacy",
-    icon: "placeholder_icon_justdeleteme",
-  },
-  {
-    id: "HiddenTools",
-    name: "Hidden Tools",
-    description: "Discover a collection of tools",
-    url: "https://hiddentools.dev/",
-    category: "Utilities",
-    icon: "placeholder_icon_hiddentools",
+    category: "privacy",
+    icon: "Shield",
   },
 
-  // Creative Tools
+  // Audio & Speech
   {
     id: "LMMS",
     name: "LMMS",
-    description: "Open-source digital audio workstation",
+    description: "Open-source digital audio workstation for music production",
     url: "https://lmms.io/",
     category: "audio",
-    icon: "placeholder_icon_lmms",
+    icon: "Music",
   },
-  {
-    id: "Previewed",
-    name: "Previewed.app",
-    description: "Create mockups and previews",
-    url: "https://previewed.app/",
-    category: "Creative",
-    icon: "placeholder_icon_previewed",
-  },
-
-  // Development & DIY Tools
-  {
-    id: "NevonProjects",
-    name: "Nevon Projects",
-    description: "DIY projects and tutorials",
-    url: "https://nevonprojects.com/",
-    category: "Development",
-    icon: "placeholder_icon_nevon",
-  },
-
-  // Research & Learning Tools
-  {
-    id: "LearnToHack",
-    name: "Learn to Hack",
-    description: "Educational resource for hacking and security",
-    url: "https://www.hacksplaining.com/",
-    category: "research",
-    icon: "placeholder_icon_hacksplaining",
-  },
-
-  // Text Generation Tools
-  {
-    id: "Speedwrite",
-    name: "Speedwrite",
-    description: "Automatic text generator",
-    url: "https://speedwrite.com/",
-    category: "text-generation",
-    icon: "placeholder_icon_speedwrite",
-  },
-  {
-    id: "HemingwayEditor",
-    name: "Hemingway Editor",
-    description: "Improve writing clarity and readability",
-    url: "https://hemingwayapp.com/",
-    category: "text-generation",
-    icon: "placeholder_icon_hemingway",
-  },
-
-  // Audio & Speech Tools
   {
     id: "ASoftMurmur",
     name: "A Soft Murmur",
-    description: "Ambient sound generator",
+    description: "Ambient sound generator for focus and relaxation",
     url: "https://asoftmurmur.com/",
     category: "audio",
-    icon: "placeholder_icon_softmurmur",
+    icon: "Volume2",
   },
   {
     id: "Uberduck",
     name: "Uberduck",
-    description: "Text-to-speech with AI voices",
+    description: "Text-to-speech with thousands of AI voices",
     url: "https://uberduck.ai/#mode=tts-basic",
     category: "audio",
-    icon: "placeholder_icon_uberduck",
+    icon: "Mic",
   },
   {
     id: "WideoTextToSpeech",
-    name: "Free Text to Speech Software (TTS) - by Wideo",
-    description: "Free text-to-speech tool",
+    name: "Free Text to Speech by Wideo",
+    description: "Free text-to-speech tool for voiceovers",
     url: "https://wideo.co/text-to-speech/",
     category: "audio",
-    icon: "placeholder_icon_wideo",
+    icon: "Volume2",
   },
   {
     id: "VocalRemover",
     name: "Vocal Remover and Isolation [AI]",
-    description: "AI-powered vocal remover and isolation",
+    description: "AI-powered vocal remover and audio isolation",
     url: "https://vocalremover.org/",
     category: "audio",
-    icon: "placeholder_icon_vocalremover",
+    icon: "Mic2",
   },
   {
     id: "SafeAudioKit",
     name: "Safeaudiokit.com",
-    description: "Safest way to process your audio files",
+    description: "Privacy-first audio file processing",
     url: "https://safeaudiokit.com/",
     category: "audio",
-    icon: "placeholder_icon_safeaudiokit",
+    icon: "Shield",
   },
   {
     id: "Boomy",
     name: "Boomy",
-    description: "AI music creation for rainy nights lo-fi",
+    description: "AI music creation with curated style presets",
     url: "https://boomy.com/style/wd_lofi/filter/rainy_nights/create",
     category: "audio",
-    icon: "placeholder_icon_boomy",
+    icon: "Music4",
   },
 
-  // Image Generation Tools
+  // Image Generation
   {
     id: "AIImageUpscaler",
     name: "AI Image Upscaler",
-    description: "Upscale & enhance photos",
+    description: "Upscale and enhance photos with AI",
     url: "https://aiimageupscaler.com/",
     category: "image-generation",
-    icon: "placeholder_icon_aiimageupscaler",
+    icon: "ImageUp",
   },
   {
     id: "GigapixelAI",
     name: "Gigapixel AI",
-    description: "Image upscaler online batch free trial",
+    description: "Online image upscaler with batch processing",
     url: "https://gigapixelai.com/image-upscaler",
     category: "image-generation",
-    icon: "placeholder_icon_gigapixel",
+    icon: "ImageUp",
+  },
+  {
+    id: "ZooZooVodafone",
+    name: "ZooZoo Vodafone LoRA",
+    description: "Stable Diffusion XL LoRA model on Civitai",
+    url: "https://civitai.com/models/409844/zoozoo-vodafone",
+    category: "image-generation",
+    icon: "Image",
+  },
+  {
+    id: "HailuoAI",
+    name: "Hailuo AI",
+    description: "Transform ideas to visuals with AI video generation",
+    url: "https://hailuoai.video/",
+    category: "image-generation",
+    icon: "Video",
   },
 
-  // Coding Tools
+  // Text Generation
+  {
+    id: "Speedwrite",
+    name: "Speedwrite",
+    description: "Automatic text generation for rapid content creation",
+    url: "https://speedwrite.com/",
+    category: "text-generation",
+    icon: "PenLine",
+  },
+  {
+    id: "HemingwayEditor",
+    name: "Hemingway Editor",
+    description: "Improve writing clarity, readability, and style",
+    url: "https://hemingwayapp.com/",
+    category: "text-generation",
+    icon: "PenTool",
+  },
+  {
+    id: "HumanizeAI",
+    name: "Humanize AI",
+    description: "Humanize AI-generated text for natural readability",
+    url: "https://www.humanizeai.pro/",
+    category: "text-generation",
+    icon: "PenLine",
+  },
+  {
+    id: "GPTZero",
+    name: "GPTZero",
+    description: "Detect AI-generated text with accuracy",
+    url: "https://app.gptzero.me/",
+    category: "text-generation",
+    icon: "SearchCheck",
+  },
+  {
+    id: "Qwen",
+    name: "Qwen",
+    description: "Advanced AI language model for various tasks",
+    url: "https://qwenlm.ai/",
+    category: "text-generation",
+    icon: "Brain",
+  },
+
+  // Coding
   {
     id: "PentestGPT",
     name: "PentestGPT",
     description: "AI-powered penetration testing assistant",
     url: "https://pentestgpt.ai/setup",
     category: "coding",
-    icon: "placeholder_icon_pentestgpt",
+    icon: "Shield",
   },
   {
     id: "LlamaCoder",
     name: "Llama Coder",
-    description: "AI code generator",
+    description: "AI code generator using Llama models",
     url: "https://llamacoder.together.ai/chats/p1zoMO63mMGXiW4n",
     category: "coding",
-    icon: "placeholder_icon_llamacoder",
-  },
-  {
-    id: "Qwen",
-    name: "Qwen",
-    description: "AI language model",
-    url: "https://qwenlm.ai/",
-    category: "coding",
-    icon: "placeholder_icon_qwen",
-  },
-  {
-    id: "ZooZooVodafone",
-    name: "ZooZoo Vodafone",
-    description: "Stable Diffusion XL LoRA model",
-    url: "https://civitai.com/models/409844/zoozoo-vodafone",
-    category: "coding",
-    icon: "placeholder_icon_zoozoo",
+    icon: "Code",
   },
   {
     id: "GithubActivityGenerator",
-    name: "Github Activity Generator",
+    name: "GitHub Activity Generator",
     description: "Script to generate a rich GitHub contribution graph",
     url: "https://github.com/Shpota/github-activity-generator",
     category: "coding",
-    icon: "placeholder_icon_githubactivity",
+    icon: "GitCommitHorizontal",
   },
   {
     id: "Lovable",
     name: "Lovable",
-    description: "AI-powered development tool",
+    description: "AI-powered full-stack development platform",
     url: "https://lovable.dev/",
     category: "coding",
-    icon: "placeholder_icon_lovable",
+    icon: "Code",
   },
   {
     id: "A0Dev",
     name: "a0.dev",
-    description: "Create mobile apps with AI",
+    description: "Create mobile apps with AI assistance",
     url: "https://a0.dev/",
     category: "coding",
-    icon: "placeholder_icon_a0dev",
+    icon: "Smartphone",
   },
   {
     id: "OpenHands",
     name: "Running OpenHands",
-    description: "Documentation for running OpenHands",
+    description: "Open-source AI coding agent platform",
     url: "https://docs.all-hands.dev/modules/usage/installation",
     category: "coding",
-    icon: "placeholder_icon_openhands",
+    icon: "Code",
+  },
+  {
+    id: "InterviewCoder",
+    name: "interviewcoder.co",
+    description: "Help and resources for coding interviews",
+    url: "https://www.interviewcoder.co/help",
+    category: "coding",
+    icon: "Brain",
   },
 
-  // UI/UX Design Tools
+  // Creative
+  {
+    id: "Previewed",
+    name: "Previewed.app",
+    description: "Create professional mockups and product previews",
+    url: "https://previewed.app/",
+    category: "creative",
+    icon: "Sparkles",
+  },
+
+  // Research & Learning
+  {
+    id: "LearnToHack",
+    name: "Hacksplaining",
+    description: "Interactive security and hacking education",
+    url: "https://www.hacksplaining.com/",
+    category: "research",
+    icon: "BookOpen",
+  },
+  {
+    id: "NevonProjects",
+    name: "Nevon Projects",
+    description: "DIY projects, tutorials, and engineering ideas",
+    url: "https://nevonprojects.com/",
+    category: "research",
+    icon: "BookOpen",
+  },
+
+  // UI/UX Design
   {
     id: "ViewportUI",
     name: "Viewport UI",
-    description: "UI curated experiences for your inspiration",
+    description: "Curated UI experiences for design inspiration",
     url: "https://viewport-ui.design/",
-    category: "UI/UX Design",
-    icon: "placeholder_icon_viewportui",
+    category: "ui-ux-design",
+    icon: "Palette",
   },
   {
     id: "IbelickLab",
-    name: "Lab",
-    description: "Experimental design lab",
+    name: "Lab by Ibelick",
+    description: "Experimental design lab with creative UI demos",
     url: "https://ibelick.com/lab",
-    category: "UI/UX Design",
-    icon: "placeholder_icon_ibelick",
+    category: "ui-ux-design",
+    icon: "FlaskConical",
   },
   {
     id: "Uiverse",
     name: "Uiverse",
     description: "The largest library of open-source UI elements",
     url: "https://uiverse.io/",
-    category: "UI/UX Design",
-    icon: "placeholder_icon_uiverse",
+    category: "ui-ux-design",
+    icon: "Component",
   },
   {
     id: "InterfaceIndex",
     name: "Interface Index",
-    description: "Collection of B2B, SaaS, and desktop interface elements",
+    description: "Collection of B2B, SaaS, and desktop interface patterns",
     url: "https://interface-index.com/",
-    category: "UI/UX Design",
-    icon: "placeholder_icon_interfaceindex",
+    category: "ui-ux-design",
+    icon: "LayoutDashboard",
   },
   {
     id: "DesignSpells",
-    name: "Mobile spells · Design Spells",
-    description: "Mobile design inspiration",
+    name: "Design Spells",
+    description: "Mobile design inspiration and UI patterns",
     url: "https://www.designspells.com/?tag=mobile",
-    category: "UI/UX Design",
-    icon: "placeholder_icon_designspells",
+    category: "ui-ux-design",
+    icon: "Smartphone",
   },
   {
     id: "CallToInspiration",
-    name: "CallToInspiration – Shopping Card",
-    description: "Shopping card design inspiration",
+    name: "Call To Inspiration",
+    description: "Shopping card and e-commerce design inspiration",
     url: "https://calltoinspiration.com/shopping-card",
-    category: "UI/UX Design",
-    icon: "placeholder_icon_calltoinspiration",
+    category: "ui-ux-design",
+    icon: "ShoppingCart",
   },
   {
     id: "ViewportUIAndroid",
     name: "Viewport UI - Android",
-    description: "UI curated experiences for Android inspiration",
+    description: "Android-specific UI design inspiration",
     url: "https://viewport-ui.design/categories/android/page/4/",
-    category: "UI/UX Design",
-    icon: "placeholder_icon_viewportuiandroid",
+    category: "ui-ux-design",
+    icon: "Palette",
   },
   {
     id: "UiverseSwitches",
-    name: "371 Toggle switches: CSS & Tailwind",
-    description: "Toggle switch designs in CSS & Tailwind",
+    name: "CSS Toggle Switches",
+    description: "371 toggle switch designs in CSS & Tailwind",
     url: "https://uiverse.io/switches",
-    category: "UI/UX Design",
-    icon: "placeholder_icon_uiverseswitches",
-  },
-
-  // AI Text Tools
-  {
-    id: "HumanizeAI",
-    name: "Humanize AI",
-    description: "Humanize AI-generated text",
-    url: "https://www.humanizeai.pro/",
-    category: "text-generation",
-    icon: "placeholder_icon_humanizeai",
-  },
-  {
-    id: "GPTZero",
-    name: "GPTZero",
-    description: "Detect AI-generated text",
-    url: "https://app.gptzero.me/",
-    category: "text-generation",
-    icon: "placeholder_icon_gptzero",
-  },
-
-  // AI Video Tools
-  {
-    id: "HailuoAI",
-    name: "Hailuo AI",
-    description: "Transform ideas to visuals with AI",
-    url: "https://hailuoai.video/",
-    category: "image-generation", // Could also be video-specific, but fits here for now
-    icon: "placeholder_icon_hailuoai",
-  },
-
-  // Career Tools
-  {
-    id: "InterviewCoder",
-    name: "interviewcoder.co/help",
-    description: "Help for coding interviews",
-    url: "https://www.interviewcoder.co/help",
-    category: "coding",
-    icon: "placeholder_icon_interviewcoder",
-  },
-  {
-    id: "ResumeIO",
-    name: "Resume Builder · Resume.io",
-    description: "Online resume builder",
-    url: "https://resume.io/app/resumes/52725130/edit",
-    category: "productivity",
-    icon: "placeholder_icon_resumeio",
+    category: "ui-ux-design",
+    icon: "ToggleLeft",
   },
 ];

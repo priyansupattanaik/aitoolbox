@@ -1,103 +1,157 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ThemeProvider } from "../context/ThemeContext";
 import BackgroundEffect from "../components/BackgroundEffect";
 import CursorEffect from "../components/CursorEffect";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import ToolGrid from "../components/ToolGrid";
-import { ArrowUp, Github } from "lucide-react";
+import { ArrowUp, Zap } from "lucide-react";
 
 const Index: React.FC = () => {
-  // Scroll to top function
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    document.querySelectorAll(".reveal, .reveal-left, .reveal-right").forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      setShowScrollTop(scrollY > 400);
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress(docHeight > 0 ? (scrollY / docHeight) * 100 : 0);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const circumference = 2 * Math.PI * 18;
+  const offset = circumference - (scrollProgress / 100) * circumference;
 
   return (
     <ThemeProvider>
-      {/* Background elements */}
       <BackgroundEffect />
       <CursorEffect />
-
-      {/* Main content */}
       <div className="relative min-h-screen">
-        {/* Navigation */}
         <Navbar />
-
-        {/* Hero section */}
         <Hero />
-
-        {/* Tools grid */}
         <ToolGrid />
 
         {/* About section */}
-        <section id="about" className="py-20 px-4">
+        <section id="about" className="py-20 sm:py-28 px-4">
           <div className="container mx-auto max-w-4xl">
-            <div className="glass rounded-2xl p-8 border border-border">
-              <h2 className="text-3xl font-bold mb-6 text-center">
-                About AI ToolBox
+            <div className="text-center mb-12 reveal">
+              <h2 className="text-3xl sm:text-4xl font-bold mb-3">
+                About <span className="text-gradient">AI ToolBox</span>
               </h2>
-              <p className="text-foreground/80 mb-4">
-                AI ToolBox is a curated collection of the most powerful and
-                innovative artificial intelligence tools available today. Our
-                mission is to help you discover the right AI solutions to
-                enhance your productivity, creativity, and workflow.
+              <p className="text-foreground/60 max-w-2xl mx-auto">
+                A curated collection of the most powerful AI tools
               </p>
-              <p className="text-foreground/80 mb-4">
-                Whether you're a developer, designer, writer, or just curious
-                about AI, we've organized the best tools by category to help you
-                find exactly what you need.
-              </p>
-              <p className="text-foreground/80">
-                This project is open-source and continuously updated with new AI
-                tools as they emerge. Feel free to contribute or suggest new
-                tools to be added to our collection.
-              </p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                {
+                  title: "Curated Selection",
+                  desc: "Every tool is hand-picked and organized by category to help you find exactly what you need.",
+                  icon: "🎯",
+                },
+                {
+                  title: "Always Free",
+                  desc: "All listed tools are free to explore. No paywalls, no subscriptions required.",
+                  icon: "💎",
+                },
+                {
+                  title: "Community Driven",
+                  desc: "Open-source and continuously updated with new AI tools as they emerge.",
+                  icon: "🌍",
+                },
+              ].map((item, i) => (
+                <div
+                  key={item.title}
+                  className="glass rounded-2xl p-6 border border-border/50 hover:border-accent/30 transition-all duration-300 hover:shadow-lg hover:shadow-accent/5 reveal"
+                  style={{ animationDelay: `${0.1 * i}s` }}
+                >
+                  <div className="text-2xl mb-3">{item.icon}</div>
+                  <h3 className="font-semibold mb-2">{item.title}</h3>
+                  <p className="text-sm text-foreground/60 leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="py-12 px-4 border-t border-border">
+        <footer className="py-12 px-4 border-t border-border/50">
           <div className="container mx-auto">
-            <div className="flex flex-col md:flex-row items-center justify-between">
-              <div className="mb-4 md:mb-0">
-                <div className="text-lg font-medium">AI ToolBox</div>
-                <p className="text-foreground/60 text-sm">
-                  A curated collection of AI tools
-                </p>
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2 text-lg font-medium">
+                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-accent to-primary flex items-center justify-center">
+                  <Zap size={14} className="text-white" />
+                </div>
+                <span className="font-mono text-sm">AI ToolBox</span>
               </div>
-
-              {/* <div className="flex items-center space-x-4">
-                <a
-                  href="https://github.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-foreground/70 hover:text-accent transition-colors"
-                  aria-label="GitHub"
-                >
-                  <Github size={20} />
-                </a>
-              </div> */}
-            </div>
-
-            <div className="mt-8 text-center text-sm text-foreground/60">
-              &copy; {new Date().getFullYear()} AI ToolBox. All rights reserved
-              with Priyansu Pattanaik.
+              <p className="text-foreground/50 text-xs text-center">
+                A curated collection of AI tools
+              </p>
+              <div className="text-xs text-foreground/40 text-center">
+                &copy; {new Date().getFullYear()} All rights reserved
+              </div>
             </div>
           </div>
         </footer>
 
-        {/* Scroll to top button */}
+        {/* Scroll to top with progress ring */}
         <button
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 p-3 rounded-full bg-accent/90 text-white shadow-lg hover:bg-accent transition-colors duration-300 z-40"
+          className={`fixed bottom-6 right-6 z-40 transition-all duration-500 ${
+            showScrollTop
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-4 pointer-events-none"
+          }`}
           aria-label="Scroll to top"
         >
-          <ArrowUp size={20} />
+          <div className="relative w-12 h-12 flex items-center justify-center">
+            <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 40 40">
+              <circle
+                cx="20" cy="20" r="18"
+                fill="none"
+                stroke="currentColor"
+                className="text-border"
+                strokeWidth="2"
+              />
+              <circle
+                cx="20" cy="20" r="18"
+                fill="none"
+                stroke="currentColor"
+                className="text-accent"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                strokeDashoffset={offset}
+                style={{ transition: "stroke-dashoffset 0.15s ease" }}
+              />
+            </svg>
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center shadow-lg shadow-accent/20 hover:shadow-xl hover:shadow-accent/30 transition-all duration-300 active:scale-90">
+              <ArrowUp size={18} className="text-white" />
+            </div>
+          </div>
         </button>
       </div>
     </ThemeProvider>
