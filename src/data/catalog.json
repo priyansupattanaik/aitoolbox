@@ -1,0 +1,210 @@
+{
+  "site": {
+    "title": "AI ToolBox",
+    "author": "Priyansu Pattanaik",
+    "language": "en"
+  },
+  "about": [
+    "AI ToolBox is the directory of this file. The page lists every entry below and groups them by category.",
+    "The name, description, and URL on each entry are copied from this file. A description is catalog text. It is not a review, a price, or a check that the link still opens.",
+    "The list keeps the writing, image, coding, and audio entries whose catalog text is about AI or generation. File transfer, software downloads, privacy utilities, design references, and the other non-AI entries were removed.",
+    "The previous page metadata names Priyansu Pattanaik as the author."
+  ],
+  "description": "AI ToolBox lists 17 entries in 4 categories. Each name, description, and link is copied from data.MD.",
+  "stamp": "85c09dede1302d54",
+  "counts": {
+    "entries": 17,
+    "categories": 4
+  },
+  "groups": [
+    {
+      "category": {
+        "id": "text-generation",
+        "name": "Text",
+        "description": "Tools that generate, rewrite, or check text"
+      },
+      "tools": [
+        {
+          "id": "Speedwrite",
+          "name": "Speedwrite",
+          "description": "Automatic text generation for rapid content creation",
+          "url": "https://speedwrite.com/",
+          "host": "speedwrite.com",
+          "category": "text-generation",
+          "index": 1
+        },
+        {
+          "id": "HumanizeAI",
+          "name": "Humanize AI",
+          "description": "Humanize AI-generated text for natural readability",
+          "url": "https://www.humanizeai.pro/",
+          "host": "humanizeai.pro",
+          "category": "text-generation",
+          "index": 2
+        },
+        {
+          "id": "GPTZero",
+          "name": "GPTZero",
+          "description": "Detect AI-generated text with accuracy",
+          "url": "https://app.gptzero.me/",
+          "host": "app.gptzero.me",
+          "category": "text-generation",
+          "index": 3
+        },
+        {
+          "id": "Qwen",
+          "name": "Qwen",
+          "description": "Advanced AI language model for various tasks",
+          "url": "https://chat.qwen.ai/",
+          "host": "chat.qwen.ai",
+          "category": "text-generation",
+          "index": 4
+        }
+      ]
+    },
+    {
+      "category": {
+        "id": "image-generation",
+        "name": "Image",
+        "description": "Tools that create and enhance images"
+      },
+      "tools": [
+        {
+          "id": "AIImageUpscaler",
+          "name": "AI Image Upscaler",
+          "description": "Upscale and enhance photos with AI",
+          "url": "https://aiimageupscaler.com/",
+          "host": "aiimageupscaler.com",
+          "category": "image-generation",
+          "index": 5
+        },
+        {
+          "id": "GigapixelAI",
+          "name": "Gigapixel AI",
+          "description": "Online image upscaler with batch processing",
+          "url": "https://gigapixelai.com/image-upscaler",
+          "host": "gigapixelai.com",
+          "category": "image-generation",
+          "index": 6
+        },
+        {
+          "id": "ZooZooVodafone",
+          "name": "ZooZoo Vodafone LoRA",
+          "description": "Stable Diffusion XL LoRA model on Civitai",
+          "url": "https://civitai.com/models/409844/zoozoo-vodafone",
+          "host": "civitai.com",
+          "category": "image-generation",
+          "index": 7
+        },
+        {
+          "id": "HailuoAI",
+          "name": "Hailuo AI",
+          "description": "Transform ideas to visuals with AI video generation",
+          "url": "https://hailuoai.video/",
+          "host": "hailuoai.video",
+          "category": "image-generation",
+          "index": 8
+        }
+      ]
+    },
+    {
+      "category": {
+        "id": "coding",
+        "name": "Coding",
+        "description": "Assistants for writing and running code"
+      },
+      "tools": [
+        {
+          "id": "PentestGPT",
+          "name": "PentestGPT",
+          "description": "AI-powered penetration testing assistant",
+          "url": "https://hackerai.co/",
+          "host": "hackerai.co",
+          "category": "coding",
+          "index": 9
+        },
+        {
+          "id": "LlamaCoder",
+          "name": "Llama Coder",
+          "description": "AI code generator using Llama models",
+          "url": "https://llamacoder.together.ai/",
+          "host": "llamacoder.together.ai",
+          "category": "coding",
+          "index": 10
+        },
+        {
+          "id": "Lovable",
+          "name": "Lovable",
+          "description": "AI-powered full-stack development platform",
+          "url": "https://lovable.dev/",
+          "host": "lovable.dev",
+          "category": "coding",
+          "index": 11
+        },
+        {
+          "id": "A0Dev",
+          "name": "a0.dev",
+          "description": "Create mobile apps with AI assistance",
+          "url": "https://a0.dev/",
+          "host": "a0.dev",
+          "category": "coding",
+          "index": 12
+        },
+        {
+          "id": "OpenHands",
+          "name": "Running OpenHands",
+          "description": "Open-source AI coding agent platform",
+          "url": "https://www.openhands.dev/",
+          "host": "openhands.dev",
+          "category": "coding",
+          "index": 13
+        }
+      ]
+    },
+    {
+      "category": {
+        "id": "audio",
+        "name": "Audio",
+        "description": "Tools for speech and music"
+      },
+      "tools": [
+        {
+          "id": "Uberduck",
+          "name": "Uberduck",
+          "description": "Text-to-speech with thousands of AI voices",
+          "url": "https://www.uberduck.ai/",
+          "host": "uberduck.ai",
+          "category": "audio",
+          "index": 14
+        },
+        {
+          "id": "WideoTextToSpeech",
+          "name": "Free Text to Speech by Wideo",
+          "description": "Free text-to-speech tool for voiceovers",
+          "url": "https://wideo.co/text-to-speech/",
+          "host": "wideo.co",
+          "category": "audio",
+          "index": 15
+        },
+        {
+          "id": "VocalRemover",
+          "name": "Vocal Remover and Isolation [AI]",
+          "description": "AI-powered vocal remover and audio isolation",
+          "url": "https://vocalremover.org/",
+          "host": "vocalremover.org",
+          "category": "audio",
+          "index": 16
+        },
+        {
+          "id": "Boomy",
+          "name": "Boomy",
+          "description": "AI music creation with curated style presets",
+          "url": "https://boomy.com/",
+          "host": "boomy.com",
+          "category": "audio",
+          "index": 17
+        }
+      ]
+    }
+  ]
+}

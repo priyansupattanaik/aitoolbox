@@ -1,34 +1,18 @@
-<<<<<<< HEAD
 # AI ToolBox
 
-A curated collection of the most powerful AI tools, organized by category.
+A React directory of the tools in `data.MD`.
 
-## Tech Stack
+## Run
 
-- **Framework**: React 18 with TypeScript
-- **Build Tool**: Vite 5 + SWC
-- **Routing**: React Router DOM v6
-- **Styling**: Tailwind CSS 3
-- **Icons**: lucide-react
-
-## Getting Started
-
-```sh
+```bash
 npm install
 npm run dev
 ```
 
-## Build
+## Edit the catalog
 
-```sh
-npm run build
-```
+1. Change an entry in `data.MD`.
+2. Run `node sync.mjs`.
+3. Reload the app.
 
-## Preview
-
-```sh
-npm run preview
-```
-=======
-A AI tool finding directory.
->>>>>>> 5ab6b69a4ad2b293303b6ed72e118bb7d473b1cb
+`sync.mjs` writes `src/data/catalog.json` and the page metadata in `index.html`. The React app reads that catalog and does not add entries.

@@ -1,194 +1,109 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 221 83% 53%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 215 25% 27%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 199 89% 48%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 222 84% 5%;
-    --radius: 0.75rem;
-    --accent-hsl: 199, 89%, 48%;
-  }
+/* Radius: 12px controls, 22px grouped lists. One family, two roles. */
+/* Bar material is a web frosted-glass approximation, not Apple Liquid Glass. */
+/* Palette is Apple system gray plus system blue. Dark background is near black, not #000. */
 
-  .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 199 89% 48%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 213 27% 84%;
-    --accent-hsl: 199, 89%, 48%;
-  }
+@property --bg { syntax: "<color>"; inherits: true; initial-value: #050505; }
+@property --surface { syntax: "<color>"; inherits: true; initial-value: #121214; }
+@property --ink { syntax: "<color>"; inherits: true; initial-value: #f5f5f7; }
+@property --secondary { syntax: "<color>"; inherits: true; initial-value: #d1d1d6; }
+@property --tertiary { syntax: "<color>"; inherits: true; initial-value: #98989d; }
+@property --accent { syntax: "<color>"; inherits: true; initial-value: #0a84ff; }
+@property --fill { syntax: "<color>"; inherits: true; initial-value: #1c1c1e; }
 
-  * {
-    @apply border-border;
-  }
+:root {
+  --bg: #050505;
+  --surface: #121214;
+  --ink: #f5f5f7;
+  --secondary: #d1d1d6;
+  --tertiary: #98989d;
+  --line: rgba(255, 255, 255, 0.1);
+  --accent: #0a84ff;
+  --accent-ink: #041018;
+  --fill: #1c1c1e;
+  --hover: rgba(255, 255, 255, 0.06);
+  --material: rgba(5, 5, 5, 0.82);
+  --shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  --spot: rgba(10, 132, 255, 0.22);
+  color-scheme: dark;
+}
 
-  html {
-    scroll-behavior: smooth;
-  }
+html {
+  background: var(--bg);
+  color: var(--ink);
+}
 
-  body {
-    @apply bg-background text-foreground font-sans antialiased;
-    overflow-x: hidden;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
+html, body, #root { min-height: 100%; }
 
-  .glass {
-    @apply backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10;
-  }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.47;
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+}
 
-  .glass-strong {
-    @apply backdrop-blur-xl bg-white/20 dark:bg-white/10 border border-white/30 dark:border-white/20 shadow-lg;
-  }
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
 
-  .neon-text {
-    @apply text-accent;
-    text-shadow: 0 0 5px theme('colors.accent.DEFAULT'),
-                 0 0 10px rgba(100, 220, 255, 0.3);
-  }
+.material {
+  background: var(--material);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
 
-  .sci-fi-border {
-    @apply relative overflow-hidden rounded-lg;
-    border: 1px solid rgba(100, 220, 255, 0.3);
-    box-shadow: 0 0 5px rgba(100, 220, 255, 0.2);
-  }
+.pressable { transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1); }
+.pressable:active { transform: scale(0.98); }
 
-  .futuristic-button {
-    @apply relative overflow-hidden rounded-lg py-2 px-4 flex items-center justify-center
-           bg-gradient-to-r from-accent/80 to-primary/80
-           text-white font-medium transition-all duration-300
-           hover:from-accent hover:to-primary hover:shadow-lg hover:shadow-accent/20
-           active:scale-[0.97];
-  }
+.orb { position: absolute; width: 22rem; height: 22rem; }
+.orb-core {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: radial-gradient(circle, var(--accent) 0%, transparent 68%);
+  opacity: 0.28;
+  filter: blur(18px);
+}
+.drift-a .orb-core { animation: drift-a 28s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+.drift-b .orb-core { animation: drift-b 34s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+.drift-c .orb-core { animation: drift-c 24s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
 
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
+@keyframes drift-a {
+  0% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(48px, -36px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes drift-b {
+  0% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(-40px, 28px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes drift-c {
+  0% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(24px, 40px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
 
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+.chip-row { scrollbar-width: none; }
+.chip-row::-webkit-scrollbar { display: none; }
 
-  /* Scroll-reveal animation */
-  .reveal {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-  }
-
-  .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .reveal-left {
-    opacity: 0;
-    transform: translateX(-24px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-  }
-
-  .reveal-left.visible {
-    opacity: 1;
-    transform: translateX(0);
-  }
-
-  .reveal-right {
-    opacity: 0;
-    transform: translateX(24px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-  }
-
-  .reveal-right.visible {
-    opacity: 1;
-    transform: translateX(0);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-    .reveal, .reveal-left, .reveal-right {
-      opacity: 1;
-      transform: none;
-      transition: none;
-    }
+@media (prefers-reduced-transparency: reduce) {
+  .material {
+    background: var(--bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 }
 
-@layer utilities {
-  .grid-pattern {
-    --grid-size: 30px;
-    --grid-color: rgba(100, 220, 255, 0.1);
-    background-size: var(--grid-size) var(--grid-size);
-    background-image:
-      linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
-  }
-
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent via-primary to-accent;
-  }
-
-  .text-responsive-xs {
-    @apply text-xs sm:text-sm;
-  }
-
-  .text-responsive-sm {
-    @apply text-sm sm:text-base;
-  }
-
-  .text-responsive-base {
-    @apply text-base sm:text-lg;
-  }
-
-  .text-responsive-lg {
-    @apply text-lg sm:text-xl md:text-2xl;
-  }
-
-  .text-responsive-xl {
-    @apply text-xl sm:text-2xl md:text-3xl;
-  }
-
-  .text-responsive-2xl {
-    @apply text-2xl sm:text-3xl md:text-4xl;
-  }
-
-  .text-responsive-3xl {
-    @apply text-3xl sm:text-4xl md:text-5xl;
-  }
+@media (prefers-reduced-motion: reduce) {
+  .pressable, .pressable:active { transition: none; transform: none; }
+  .drift-a .orb-core, .drift-b .orb-core, .drift-c .orb-core { animation: none; }
 }
