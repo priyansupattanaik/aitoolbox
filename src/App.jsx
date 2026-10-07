@@ -1,153 +1,38 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
-  ArrowUpRight,
-  Brain,
-  Code,
-  Cpu,
-  Database,
-  DownloadSimple,
-  FilmStrip,
-  Image,
-  Lightning,
-  LockSimple,
+  ArrowSquareOut,
+  Check,
+  Copy,
+  GithubLogo,
   MagnifyingGlass,
-  Microphone,
-  PaintBrush,
-  Palette,
-  PenNib,
-  Robot,
-  ShareNetwork,
-  ShieldCheck,
-  Sparkle,
+  TerminalWindow,
+  X,
 } from "@phosphor-icons/react";
 import fallbackCatalog from "./data/catalog.json";
 import { loadCatalog } from "./lib/loadCatalog";
 
-const ICONS = {
-  "text-generation": PenNib,
-  "image-generation": Image,
-  coding: Code,
-  audio: Microphone,
-  "agent-harnesses": Robot,
-  "agent-skills": Sparkle,
-  "video-generation": FilmStrip,
-  "memory-rag": Database,
-  "ml-infra": Cpu,
-  "security-osint": ShieldCheck,
-  productivity: Lightning,
-  research: MagnifyingGlass,
-  "file-sharing": ShareNetwork,
-  "software-downloads": DownloadSimple,
-  privacy: LockSimple,
-  "ui-ux-design": Palette,
-  creative: PaintBrush,
-};
-
-const spring = { type: "spring", bounce: 0, duration: 0.45 };
-const page = "mx-auto w-full max-w-[920px] px-5";
-
-function useFinePointer() {
-  const [fine, setFine] = useState(() => window.matchMedia("(pointer: fine)").matches);
-  useEffect(() => {
-    const query = window.matchMedia("(pointer: fine)");
-    const apply = () => setFine(query.matches);
-    query.addEventListener("change", apply);
-    return () => query.removeEventListener("change", apply);
-  }, []);
-  return fine;
-}
-
-function Logo({ size = 28 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
-      <rect x="4" y="9" width="17" height="17" rx="5" fill="var(--accent)" opacity="0.28" />
-      <rect x="11" y="6" width="17" height="17" rx="5" fill="var(--accent)" />
-    </svg>
-  );
-}
-
-function FlowField() {
-  const reduce = useReducedMotion();
-  const px = useMotionValue(0);
-  const py = useMotionValue(0);
-  useEffect(() => {
-    if (reduce) return undefined;
-    const move = (event) => {
-      px.set(event.clientX / window.innerWidth - 0.5);
-      py.set(event.clientY / window.innerHeight - 0.5);
-    };
-    window.addEventListener("pointermove", move, { passive: true });
-    return () => window.removeEventListener("pointermove", move);
-  }, [reduce, px, py]);
-  if (reduce) return null;
-  return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
-      <Orb className="left-[-6rem] top-[8%] drift-a" factor={36} px={px} py={py} />
-      <Orb className="right-[-8rem] top-[36%] drift-b" factor={-48} px={px} py={py} />
-      <Orb className="left-[18%] bottom-[-8rem] drift-c" factor={22} px={px} py={py} />
-    </div>
-  );
-}
-
-function Orb({ className, factor, px, py }) {
-  const x = useTransform(px, (value) => value * factor);
-  const y = useTransform(py, (value) => value * factor * 0.75);
-  const sx = useSpring(x, { bounce: 0, duration: 1.1 });
-  const sy = useSpring(y, { bounce: 0, duration: 1.3 });
-  return (
-    <motion.span className={`orb ${className}`} style={{ x: sx, y: sy }}>
-      <span className="orb-core" />
-    </motion.span>
-  );
+function getInstallCommand(tool) {
+  if (!tool) return "";
+  const rawUrl = tool.url || "";
+  if (rawUrl.includes("github.com/")) {
+    const clean = rawUrl.replace(/\/+$/, "").replace(/\.git$/, "");
+    return `git clone ${clean}.git`;
+  }
+  const slug = (tool.id || tool.name || "tool")
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return `npx aitoolbox ${slug}`;
 }
 
 export default function App() {
-  const path = window.location.pathname;
-  if (path !== "/" && path !== "/index.html") return <Missing />;
-  return <Directory />;
-}
-
-function Missing() {
-  return (
-    <div className="relative min-h-[100dvh]">
-      <FlowField />
-      <Bar title={fallbackCatalog.site.title} />
-      <main className={`relative z-10 ${page} pt-16`}>
-        <h1 className="max-w-[12ch] text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.03em]">
-          This page is not in the directory.
-        </h1>
-        <p className="mt-4 max-w-[36rem] text-[var(--secondary)]">The address does not match a page on this site.</p>
-        <a className="pressable mt-8 inline-flex min-h-11 items-center rounded-[12px] bg-[var(--accent)] px-4 font-semibold text-[var(--accent-ink)]" href="/">
-          Back to the directory
-        </a>
-      </main>
-    </div>
-  );
-}
-
-function Bar({ title }) {
-  return (
-    <header className="material sticky top-0 z-20 h-16 border-b border-[var(--line)]">
-      <div className={`${page} flex h-16 items-center`}>
-        <a href="#top" className="inline-flex items-center gap-2.5 whitespace-nowrap text-[1.0625rem] font-semibold tracking-[-0.03em]">
-          <Logo />
-          {title}
-        </a>
-      </div>
-    </header>
-  );
-}
-
-function Directory() {
-  const reduce = useReducedMotion();
-  const fine = useFinePointer();
   const [catalog, setCatalog] = useState(fallbackCatalog);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState(() => readFilter());
-  const ids = useMemo(() => new Set(catalog.groups.map((group) => group.category.id)), [catalog]);
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [copiedId, setCopiedId] = useState(null);
 
+  // Load live Google Sheet catalog with graceful fallback
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -161,286 +46,341 @@ function Directory() {
     };
   }, []);
 
+  // Hash-routing sync for category selection
   useEffect(() => {
-    const onHash = () => setFilter(readFilter());
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
-  }, []);
-
-  useEffect(() => {
-    const onKey = (event) => {
-      if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) return;
-      const tag = event.target?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || event.target?.isContentEditable) return;
-      event.preventDefault();
-      document.getElementById("q")?.focus();
+    const handleHash = () => {
+      const hash = window.location.hash.replace(/^#/, "");
+      if (hash && hash !== "top") {
+        setActiveCategory(hash);
+      } else {
+        setActiveCategory("all");
+      }
     };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    handleHash();
+    window.addEventListener("hashchange", handleHash);
+    return () => window.removeEventListener("hashchange", handleHash);
   }, []);
 
+  // Keyboard shortcut '/' for quick search focus, 'Escape' to clear
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "/" && document.activeElement?.tagName !== "INPUT") {
+        e.preventDefault();
+        document.getElementById("search-input")?.focus();
+      }
+      if (e.key === "Escape" && document.activeElement?.id === "search-input") {
+        setQuery("");
+        document.getElementById("search-input")?.blur();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  // Category list from catalog
+  const categories = useMemo(() => {
+    return catalog.groups.map((g) => ({
+      id: g.category.id,
+      name: g.category.name,
+      description: g.category.description,
+      count: g.tools.length,
+    }));
+  }, [catalog]);
+
+  // Flatten all tools across categories
+  const allTools = useMemo(() => {
+    const list = [];
+    for (const group of catalog.groups) {
+      for (const tool of group.tools) {
+        list.push({
+          ...tool,
+          categoryName: group.category.name,
+          categoryDescription: group.category.description,
+        });
+      }
+    }
+    return list;
+  }, [catalog]);
+
+  // Real-time search filter
   const q = query.trim().toLowerCase();
-  const active = ids.has(filter) ? filter : "";
-  const visibleGroups = catalog.groups
-    .map((group) => ({
-      ...group,
-      tools: group.tools.filter((tool) => {
-        if (active && tool.category !== active) return false;
-        if (!q) return true;
-        const blob = [tool.name, tool.description, tool.host, tool.url, group.category.name].join(" ").toLowerCase();
-        return blob.includes(q);
-      }),
-    }))
-    .filter((group) => group.tools.length > 0);
-  const shown = visibleGroups.reduce((sum, group) => sum + group.tools.length, 0);
+  const filteredTools = useMemo(() => {
+    return allTools.filter((t) => {
+      if (activeCategory !== "all" && t.category !== activeCategory) {
+        return false;
+      }
+      if (!q) return true;
+      const haystack = `${t.name} ${t.description} ${t.host} ${t.categoryName}`.toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [allTools, activeCategory, q]);
 
-  useEffect(() => {
-    const row = document.getElementById("category-row");
-    if (!row) return undefined;
-    const align = () => {
-      const pressed = row.querySelector('[aria-pressed="true"]');
-      if (!pressed || row.scrollWidth <= row.clientWidth + 1) return;
-      const rowBox = row.getBoundingClientRect();
-      const chipBox = pressed.getBoundingClientRect();
-      const delta = chipBox.left - rowBox.left - (rowBox.width - chipBox.width) / 2;
-      if (Math.abs(delta) < 2) return;
-      row.scrollBy({ left: delta, behavior: reduce ? "auto" : "smooth" });
-    };
-    align();
-    const observer = new ResizeObserver(align);
-    observer.observe(row);
-    return () => observer.disconnect();
-  }, [active, reduce]);
-
-  const choose = (id) => {
-    const next = id && ids.has(id) ? id : "";
-    const url = next ? `#${next}` : window.location.pathname + window.location.search;
-    history.pushState(null, "", url);
-    setFilter(next);
+  // 1-click copy snippet
+  const handleCopyCommand = (cmd, toolId) => {
+    if (!cmd) return;
+    navigator.clipboard?.writeText(cmd);
+    setCopiedId(toolId);
+    setTimeout(() => {
+      setCopiedId((curr) => (curr === toolId ? null : curr));
+    }, 1800);
   };
 
-  const fade = reduce ? { duration: 0.2 } : spring;
-
-  if (loading) {
-    return (
-      <div className="relative min-h-[100dvh]">
-        <FlowField />
-        <Bar title={catalog.site.title} />
-        <main className={`relative z-10 ${page} pt-16`}>
-          <p className="text-[var(--secondary)]" aria-live="polite">
-            Loading catalog…
-          </p>
-        </main>
-      </div>
-    );
-  }
+  const handleSelectCategory = (catId) => {
+    setActiveCategory(catId);
+    if (catId === "all") {
+      window.history.pushState(null, "", window.location.pathname + window.location.search);
+    } else {
+      window.location.hash = catId;
+    }
+  };
 
   return (
-    <div className="relative min-h-[100dvh]">
-      <FlowField />
-      <a className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-30 focus:rounded-[12px] focus:bg-[var(--accent)] focus:px-3 focus:py-2 focus:text-[var(--accent-ink)]" href="#catalog">
-        Skip to the catalog
-      </a>
-      <Bar title={catalog.site.title} />
-      <main className={`relative z-10 ${page} pb-24`}>
-        <header id="top" className="pb-8 pt-10 md:pt-14">
-          <motion.h1
-            className="text-[clamp(2.75rem,7vw,3.5rem)] font-semibold leading-[1.05] tracking-[-0.03em]"
-            initial={reduce ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={fade}
-          >
-            {catalog.site.title}
-          </motion.h1>
-          <motion.p
-            className="mt-3 max-w-[28rem] text-[var(--secondary)]"
-            initial={reduce ? false : { opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={reduce ? fade : { ...spring, delay: 0.05 }}
-          >
-            {catalog.counts.entries} AI entries in {catalog.counts.categories} groups.
-          </motion.p>
-          <motion.form
-            role="search"
-            className="mt-8 max-w-[28rem]"
-            initial={reduce ? false : { opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={reduce ? fade : { ...spring, delay: 0.1 }}
-            onSubmit={(event) => {
-              event.preventDefault();
-              document.querySelector("[data-tool]")?.focus();
+    <div className="min-h-screen bg-[#000000] text-[#f4f4f5] selection:bg-zinc-800 selection:text-white flex flex-col font-sans">
+      {/* Top utility bar */}
+      <header className="border-b border-zinc-900 bg-[#000000]/90 backdrop-blur-md sticky top-0 z-30">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              handleSelectCategory("all");
+              setQuery("");
+              window.scrollTo({ top: 0, behavior: "smooth" });
             }}
+            className="text-sm font-semibold tracking-tight text-zinc-100 hover:text-white transition-colors"
           >
-            <label htmlFor="q" className="mb-2 block text-[0.9375rem] font-semibold tracking-[-0.01em]">
-              Search
-            </label>
-            <input
-              id="q"
-              name="q"
-              type="search"
-              value={query}
-              autoComplete="off"
-              enterKeyHint="search"
-              placeholder="Name or description"
-              onChange={(event) => setQuery(event.target.value)}
-              className="h-12 w-full rounded-[12px] border border-transparent bg-[var(--fill)] px-4 text-[1.0625rem] text-[var(--ink)] outline-none placeholder:text-[var(--tertiary)] focus-visible:border-[var(--accent)]"
-            />
-          </motion.form>
-        </header>
+            AI ToolBox
+          </a>
 
-        <p id="result-count" className="text-[0.8125rem] tracking-[-0.006em] text-[var(--tertiary)]" aria-live="polite">
-          Showing {shown} of {catalog.counts.entries}.
-        </p>
-
-        <div id="catalog" className="scroll-mt-20 pt-4">
-          <div className="sticky top-16 z-10 -mx-5 bg-[var(--bg)] px-5 py-3">
-            <div id="category-row" className="chip-row flex gap-2 overflow-x-auto" role="toolbar" aria-label="Categories">
-              <Chip pressed={!active} onClick={() => choose("")} count={catalog.counts.entries}>All</Chip>
-              {catalog.groups.map((group) => (
-                <Chip
-                  key={group.category.id}
-                  pressed={active === group.category.id}
-                  onClick={() => choose(group.category.id)}
-                  count={group.tools.length}
-                >
-                  {group.category.name}
-                </Chip>
-              ))}
-            </div>
+          <div className="flex items-center gap-4 text-xs text-zinc-400">
+            <span className="font-mono">{allTools.length} tools</span>
+            <a
+              href="https://github.com/priyansupattanaik/aitoolbox"
+              target="_blank"
+              rel="noreferrer"
+              className="text-zinc-400 hover:text-zinc-200 transition-colors p-1"
+              title="GitHub Repository"
+              aria-label="GitHub Repository"
+            >
+              <GithubLogo size={18} weight="bold" />
+            </a>
           </div>
-
-          <AnimatePresence mode="popLayout" initial={false}>
-            {shown === 0 ? (
-              <motion.div
-                key="empty"
-                initial={reduce ? false : { opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={fade}
-                className="mt-6 rounded-[22px] border border-[var(--line)] bg-[var(--surface)] px-5 py-8 shadow-[var(--shadow)]"
-              >
-                <p>No entry matches &quot;{query.trim()}&quot;.</p>
-                <button
-                  type="button"
-                  className="pressable mt-4 min-h-11 font-semibold text-[var(--accent)]"
-                  onClick={() => {
-                    setQuery("");
-                    choose("");
-                  }}
-                >
-                  Show every entry
-                </button>
-              </motion.div>
-            ) : (
-              <motion.div key={active || "all"} className="mt-4 flex flex-col gap-12">
-                {visibleGroups.map((group) => {
-                  const Icon = ICONS[group.category.id] || Brain;
-                  return (
-                    <motion.section
-                      key={group.category.id}
-                      id={group.category.id}
-                      className="scroll-mt-24"
-                      initial={reduce ? false : { opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={reduce ? { opacity: 0 } : { opacity: 0, y: -8 }}
-                      transition={fade}
-                    >
-                      <div className="mb-3 flex items-center gap-2.5">
-                        <Icon size={20} weight="regular" aria-hidden="true" className="text-[var(--accent)]" />
-                        <h2 className="text-[1.375rem] font-semibold leading-[1.15] tracking-[-0.022em]">{group.category.name}</h2>
-                      </div>
-                      <p className="mb-4 text-[0.9375rem] text-[var(--secondary)]">{group.category.description}</p>
-                      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <AnimatePresence initial={false}>
-                          {group.tools.map((tool) => (
-                            <ToolCard key={tool.id} tool={tool} reduce={reduce} fine={fine} fade={fade} />
-                          ))}
-                        </AnimatePresence>
-                      </ul>
-                    </motion.section>
-                  );
-                })}
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
+      </header>
+
+      {/* Main Container */}
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 pt-10 pb-20">
+        {/* Functional Minimalist Hero */}
+        <section className="mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-100 mb-2">
+            AI ToolBox
+          </h1>
+          <p className="text-base text-zinc-400">
+            Developer index of AI tools, skills, and libraries
+          </p>
+        </section>
+
+        {/* Search Input */}
+        <section className="mb-5 max-w-2xl">
+          <div className="relative flex items-center bg-[#0a0a0a] border border-zinc-800/80 rounded-xl px-3.5 py-2.5 focus-within:border-zinc-600 focus-within:ring-1 focus-within:ring-zinc-600 transition-all">
+            <MagnifyingGlass size={18} className="text-zinc-400 shrink-0 mr-2.5" />
+            <input
+              id="search-input"
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search by name, description, or host... (Press /)"
+              className="w-full bg-transparent text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none"
+              autoComplete="off"
+              spellCheck="false"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                className="p-1 rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors mr-2"
+                title="Clear Search"
+              >
+                <X size={14} />
+              </button>
+            )}
+            <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono font-medium text-zinc-500 bg-zinc-900 border border-zinc-800 rounded">
+              /
+            </kbd>
+          </div>
+        </section>
+
+        {/* Category Pills */}
+        <section className="mb-8">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 flex-wrap">
+            <button
+              type="button"
+              onClick={() => handleSelectCategory("all")}
+              className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors shrink-0 border ${
+                activeCategory === "all"
+                  ? "bg-zinc-100 text-zinc-950 border-zinc-100 font-semibold shadow-xs"
+                  : "bg-[#0a0a0a] text-zinc-400 border-zinc-800 hover:text-zinc-200 hover:border-zinc-700"
+              }`}
+            >
+              All <span className="text-[11px] opacity-70 ml-1 font-mono">({allTools.length})</span>
+            </button>
+
+            {categories.map((c) => {
+              const isSelected = activeCategory === c.id;
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => handleSelectCategory(c.id)}
+                  className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors shrink-0 border ${
+                    isSelected
+                      ? "bg-zinc-100 text-zinc-950 border-zinc-100 font-semibold shadow-xs"
+                      : "bg-[#0a0a0a] text-zinc-400 border-zinc-800 hover:text-zinc-200 hover:border-zinc-700"
+                  }`}
+                >
+                  {c.name}
+                  <span className="text-[11px] opacity-70 ml-1 font-mono">({c.count})</span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Results Counter / Status */}
+        <div className="flex items-center justify-between text-xs text-zinc-500 mb-6 pb-2 border-b border-zinc-900 font-mono">
+          <span>
+            Showing {filteredTools.length} {filteredTools.length === 1 ? "tool" : "tools"}
+            {activeCategory !== "all" ? ` in ${categories.find((c) => c.id === activeCategory)?.name || activeCategory}` : ""}
+          </span>
+          {loading && <span>Updating live catalog...</span>}
+        </div>
+
+        {/* Tool Cards Grid */}
+        {filteredTools.length === 0 ? (
+          <div className="text-center py-16 px-4 border border-dashed border-zinc-900 rounded-2xl bg-[#0a0a0a]">
+            <p className="text-sm text-zinc-400 mb-3">
+              No tools match &ldquo;{query}&rdquo;
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setQuery("");
+                handleSelectCategory("all");
+              }}
+              className="text-xs px-3.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-200 transition-colors font-medium border border-zinc-800"
+            >
+              Reset filters
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredTools.map((tool) => {
+              const command = getInstallCommand(tool);
+              const isCopied = copiedId === tool.id;
+
+              return (
+                <article
+                  key={tool.id}
+                  className="rounded-2xl border border-zinc-800/70 bg-[#0a0a0a] p-4 sm:p-5 hover:border-zinc-700 transition-colors flex flex-col justify-between"
+                >
+                  <div className="flex flex-col gap-2.5">
+                    {/* Top row: Name, Category Badge, Direct Link */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-baseline flex-wrap gap-x-2 gap-y-1">
+                        <h2 className="text-base font-semibold tracking-tight text-zinc-100">
+                          {tool.name}
+                        </h2>
+                        <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-zinc-900 text-zinc-400 border border-zinc-800">
+                          {tool.categoryName}
+                        </span>
+                      </div>
+
+                      <a
+                        href={tool.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 text-zinc-950 hover:bg-white hover:text-black transition-colors"
+                      >
+                        <span>Visit</span>
+                        <ArrowSquareOut size={12} weight="bold" />
+                      </a>
+                    </div>
+
+                    {/* 1-line description directly from catalog / sheet */}
+                    <p className="text-xs text-zinc-400 leading-relaxed line-clamp-2">
+                      {tool.description}
+                    </p>
+                  </div>
+
+                  <div className="mt-4 flex flex-col gap-2">
+                    {/* CLI command snippet / copy bar */}
+                    {command && (
+                      <div className="flex items-center justify-between gap-2 bg-[#000000] border border-zinc-850 border-zinc-800/80 rounded-lg px-2.5 py-1.5">
+                        <div className="flex items-center gap-1.5 min-w-0 overflow-x-auto no-scrollbar">
+                          <TerminalWindow size={13} className="text-zinc-500 shrink-0" />
+                          <code className="text-[11px] font-mono text-zinc-300 whitespace-nowrap select-all">
+                            {command}
+                          </code>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleCopyCommand(command, tool.id)}
+                          className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
+                            isCopied
+                              ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                              : "bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800"
+                          }`}
+                          title="Copy command to clipboard"
+                          aria-label={`Copy command for ${tool.name}`}
+                        >
+                          {isCopied ? (
+                            <>
+                              <Check size={11} weight="bold" />
+                              <span>Copied</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy size={11} />
+                              <span>Copy</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Host note */}
+                    {tool.host && (
+                      <div className="text-[10px] font-mono text-zinc-500">
+                        {tool.host}
+                      </div>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
       </main>
-      <footer className="relative z-10 border-t border-[var(--line)]">
-        <p className={`${page} flex items-center gap-2.5 py-6 text-[0.9375rem] text-[var(--secondary)]`}>
-          <Logo size={20} />
-          {catalog.site.author}
-        </p>
+
+      {/* Clean Colophon Footer */}
+      <footer className="border-t border-zinc-900 bg-[#000000] py-8 text-xs text-zinc-500">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p>
+            AI ToolBox &middot; Curated by {catalog.site?.author || "Priyansu Pattanaik"}
+          </p>
+          <a
+            href="#top"
+            onClick={(e) => {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            className="text-zinc-400 hover:text-zinc-200 transition-colors"
+          >
+            Back to top &uarr;
+          </a>
+        </div>
       </footer>
     </div>
   );
-}
-
-function ToolCard({ tool, reduce, fine, fade }) {
-  const ref = useRef(null);
-  const [hot, setHot] = useState(false);
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const spot = useMotionTemplate`radial-gradient(220px circle at ${mx}px ${my}px, var(--spot), transparent 72%)`;
-  const reactive = fine && !reduce;
-  return (
-    <motion.li
-      layout
-      initial={reduce ? false : { opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0 }}
-      transition={fade}
-      className="min-w-0"
-    >
-      <motion.a
-        ref={ref}
-        data-tool
-        href={tool.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        onPointerEnter={() => setHot(true)}
-        onPointerLeave={() => setHot(false)}
-        onPointerMove={(event) => {
-          if (!reactive || !ref.current) return;
-          const box = ref.current.getBoundingClientRect();
-          mx.set(event.clientX - box.left);
-          my.set(event.clientY - box.top);
-        }}
-        whileHover={reactive ? { y: -3 } : undefined}
-        whileTap={reduce ? undefined : { scale: 0.985 }}
-        transition={spring}
-        className="relative flex h-full min-h-[9.5rem] flex-col overflow-hidden rounded-[22px] border border-[var(--line)] bg-[var(--surface)] p-4 shadow-[var(--shadow)]"
-      >
-        {reactive && hot ? <motion.span aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ background: spot }} /> : null}
-        <span className="relative flex items-start justify-between gap-3">
-          <span className="font-semibold tracking-[-0.018em]">{tool.name}</span>
-          <ArrowUpRight size={16} weight="regular" aria-hidden="true" className="mt-1 shrink-0 text-[var(--accent)]" />
-        </span>
-        <span className="relative mt-2 text-[0.9375rem] text-[var(--secondary)]">{tool.description}</span>
-        <span className="relative mt-auto pt-4 text-[0.8125rem] tracking-[-0.006em] text-[var(--tertiary)]">
-          {tool.host}
-          <span className="sr-only"> opens in a new tab</span>
-        </span>
-      </motion.a>
-    </motion.li>
-  );
-}
-
-function Chip({ pressed, onClick, count, children }) {
-  return (
-    <button
-      type="button"
-      aria-pressed={pressed}
-      onClick={onClick}
-      className={`pressable inline-flex min-h-11 shrink-0 items-center gap-2 rounded-[12px] px-3 text-[0.9375rem] ${
-        pressed ? "bg-[var(--accent)] font-semibold text-[var(--accent-ink)]" : "bg-[var(--fill)] text-[var(--ink)]"
-      }`}
-    >
-      <span>{children}</span>
-      <span className={pressed ? "" : "text-[var(--tertiary)]"}>{count}</span>
-    </button>
-  );
-}
-
-function readFilter() {
-  return decodeURIComponent(window.location.hash.replace(/^#/, ""));
 }
