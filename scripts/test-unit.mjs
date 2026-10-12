@@ -6,6 +6,7 @@ import { safeHttpUrl, hostFromUrl } from "../src/utils/url.js";
 import { validateIsoDate, formatSheetDate, sectionKey } from "../src/utils/formatters.js";
 import { resolveIcon } from "../src/utils/icons.js";
 import { buildCatalog, csvTextToRows, loadCatalogFromSheet, DEFAULT_SHEET, sheetConfigFromEnv } from "../src/shared/catalogCore.js";
+import { sortTools, SORT_OPTIONS, isSortId } from "../src/utils/sort.js";
 import handler from "../netlify/functions/catalog.mjs";
 
 console.log("Test 1: CSV Parser...");
@@ -63,7 +64,7 @@ assert.strictEqual(beta.sourceScreenshot, "");
 assert.strictEqual(beta.added, "");
 assert.strictEqual(built.groups[1].category.name, "Uncategorized");
 assert(!JSON.stringify(built).includes("SHOULD_NOT_LEAK"), "internal columns must be dropped");
-assert.deepStrictEqual(Object.keys(alpha).sort(), ["added","category","description","host","icon","id","index","name","source","sourceNote","sourceScreenshot","sourceUrl","url"]);
+assert.deepStrictEqual(Object.keys(alpha).sort(), ["added","category","description","github","host","icon","id","index","name","source","sourceNote","sourceScreenshot","sourceUrl","url"]);
 assert.strictEqual(buildCatalog([], []), null);
 assert.strictEqual(sheetConfigFromEnv({}).sheetId, DEFAULT_SHEET.sheetId);
 assert.strictEqual(sheetConfigFromEnv({ SHEET_ID: "abc" }).sheetId, "abc");
@@ -85,6 +86,27 @@ if (existsSync("dist")) {
     }
   }
 }
+
+console.log("Test 8: Sort logic...");
+const sample = [
+  { name: "beta", added: "2026-10-07", categoryName: "Coding", source: "X", github: "", index: 1 },
+  { name: "Alpha", added: "", categoryName: "Agents", source: "GitHub", github: "https://github.com/a", index: 2 },
+  { name: "gamma", added: "2026-10-12", categoryName: "", source: "", github: "https://github.com/g", index: 3 },
+  { name: "Delta", added: "2025-01-01", categoryName: "Coding", source: "Hacker News", github: "", index: 4 },
+];
+const names = (id) => sortTools(sample, id).map((t) => t.name);
+assert.deepStrictEqual(names("name-asc"), ["Alpha", "beta", "Delta", "gamma"]);
+assert.deepStrictEqual(names("name-desc"), ["gamma", "Delta", "beta", "Alpha"]);
+assert.deepStrictEqual(names("newest"), ["gamma", "beta", "Delta", "Alpha"]);
+assert.deepStrictEqual(names("oldest"), ["Delta", "beta", "gamma", "Alpha"]);
+assert.deepStrictEqual(names("category"), ["Alpha", "beta", "Delta", "gamma"]);
+assert.deepStrictEqual(names("source"), ["Alpha", "Delta", "beta", "gamma"]);
+assert.deepStrictEqual(names("github-first"), ["Alpha", "gamma", "beta", "Delta"]);
+assert.deepStrictEqual(names("bogus"), names("name-asc"));
+assert.strictEqual(sample[0].name, "beta", "input must not be mutated");
+assert.strictEqual(SORT_OPTIONS.length, 7);
+assert(isSortId("newest") && !isSortId("x"));
+assert.deepStrictEqual(sortTools(undefined), []);
 
 console.log("Test 7: Live sheet via Netlify Function handler...");
 const res = await handler(new Request("http://localhost/api/catalog"));

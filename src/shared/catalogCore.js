@@ -93,6 +93,7 @@ export function buildCatalog(toolRows, catRows) {
       host: hostFromUrl(url),
       category: groupKey,
       icon: clean(row.icon),
+      github: safeHttpUrl(row.github) || "",
       added: validateIsoDate(clean(row.date_added)),
       source: clean(row.source),
       sourceUrl: safeHttpUrl(row.source_url) || "",

@@ -1,178 +1,96 @@
-import React, { useEffect, useState } from "react";
-import { useReducedMotion } from "motion/react";
+import React from "react";
 import { useCatalog } from "./hooks/useCatalog.js";
 import { useCatalogDirectory } from "./hooks/useCatalogDirectory.js";
-import { useSmoothScroll } from "./hooks/useSmoothScroll.js";
 import { useSpotlightHover } from "./hooks/useSpotlightHover.js";
-import { Navbar } from "./components/layout/Navbar.jsx";
+import { Header } from "./components/layout/Header.jsx";
 import { Footer } from "./components/layout/Footer.jsx";
-import { HeroSection } from "./components/hero/HeroSection.jsx";
-import { CategoryChips } from "./components/filters/CategoryChips.jsx";
-import { RecentSection } from "./components/tools/RecentSection.jsx";
-import { ToolGrid } from "./components/tools/ToolGrid.jsx";
-import { AlphabetRail } from "./components/tools/AlphabetRail.jsx";
+import { SearchBar } from "./components/hero/SearchBar.jsx";
+import { CategoryNav } from "./components/filters/CategoryNav.jsx";
+import { SortSelect } from "./components/filters/SortSelect.jsx";
+import { ToolCard } from "./components/tools/ToolCard.jsx";
 import { LoadingView } from "./components/common/LoadingView.jsx";
 import { EmptyState } from "./components/common/EmptyState.jsx";
 import { CatalogError } from "./components/common/CatalogError.jsx";
 import { ErrorBoundary } from "./components/common/ErrorBoundary.jsx";
+import { SORT_OPTIONS } from "./utils/sort.js";
 
 export default function App() {
-  const reduceMotion = useReducedMotion();
-  const { scrollToY, scrollToId } = useSmoothScroll(reduceMotion);
-
   const { catalog, loading, error, reloadCatalog } = useCatalog();
-
   const {
-    query,
-    setQuery,
-    activeCategory,
-    selectCategory,
-    categories,
-    activeCategoryMeta,
-    allTools,
-    filteredTools,
-    recent,
-    sections,
+    query, setQuery, activeCategory, selectCategory, sortId, setSortId,
+    categories, activeCategoryMeta, allTools, filteredTools,
   } = useCatalogDirectory(catalog);
+  const { hoveredId, handleMouseEnter, handleMouseLeave, handleFocus, handleBlur } = useSpotlightHover();
 
-  const {
-    hoveredId,
-    hasSpotlight,
-    handleMouseEnter,
-    handleMouseLeave,
-    handleFocus,
-    handleBlur,
-  } = useSpotlightHover();
-
-  const [currentLetter, setCurrentLetter] = useState("");
-
-  // Track active letter section for AlphabetRail
-  useEffect(() => {
-    if (sections.length < 2) return undefined;
-
-    let frame = 0;
-    let queued = false;
-
-    const measureActiveLetter = () => {
-      queued = false;
-      const bar = document.querySelector(".nav-bar-container");
-      const threshold = (bar?.getBoundingClientRect().height ?? 64) + 16;
-      let active = sections[0].key;
-
-      for (const section of sections) {
-        const node = document.getElementById(`letter-${section.key}`);
-        if (node && node.getBoundingClientRect().top <= threshold) {
-          active = section.key;
-        }
-      }
-      setCurrentLetter((prev) => (prev === active ? prev : active));
-    };
-
-    const handleScroll = () => {
-      if (queued) return;
-      queued = true;
-      frame = requestAnimationFrame(measureActiveLetter);
-    };
-
-    measureActiveLetter();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll);
-
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
-    };
-  }, [sections]);
-
-  const handleResetFilters = () => {
+  const reset = () => {
     setQuery("");
     selectCategory("all");
-    scrollToY(0);
+    window.scrollTo({ top: 0 });
   };
 
-  if (loading) {
-    return <LoadingView />;
-  }
+  if (loading) return <LoadingView />;
+  if (!catalog) return <CatalogError message={error} onRetry={reloadCatalog} />;
 
-  if (!catalog) {
-    return <CatalogError message={error} onRetry={reloadCatalog} />;
-  }
+  const sortLabel = SORT_OPTIONS.find((o) => o.id === sortId)?.label || "";
 
   return (
     <ErrorBoundary>
       <div className="app-shell">
-        <a className="skip-link" href="#tools-directory">
-          Skip to directory
-        </a>
+        <a className="skip-link" href="#tools-directory">Skip to tools</a>
+        <Header totalTools={allTools.length} totalCategories={categories.length} onBrandClick={reset} />
 
-        {/* Ambient OLED background glow */}
-        <div className="ambient-mesh-glow" aria-hidden="true" />
+        <section className="intro">
+          <h1>Free &amp; open-source AI tools</h1>
+          <p>A curated directory of AI, UI and agent tools, loaded live from the AIToolBox DB sheet.</p>
+        </section>
 
-        <Navbar
-          totalTools={allTools.length}
-          onBrandClick={handleResetFilters}
-        />
-
-        <main className="content-container" id="top">
-          <HeroSection
-            query={query}
-            setQuery={setQuery}
-            totalTools={allTools.length}
-          />
-
-          <CategoryChips
-            categories={categories}
-            activeCategory={activeCategory}
-            onSelectCategory={selectCategory}
-            activeCategoryMeta={activeCategoryMeta}
-          />
-
-          <div className="directory-status-bar" aria-live="polite">
-            <span className="results-count">
-              <strong>{filteredTools.length}</strong> {filteredTools.length === 1 ? "tool" : "tools"}
-              {activeCategory !== "all" && activeCategoryMeta ? ` in ${activeCategoryMeta.name}` : ""}
-              {query.trim() ? ` matching “${query.trim()}”` : ""}
-            </span>
-          </div>
-
-          <RecentSection
-            recent={recent}
-            hoveredId={hoveredId}
-            hasSpotlight={hasSpotlight}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-          />
-
-          {filteredTools.length === 0 ? (
-            <EmptyState query={query} onReset={handleResetFilters} />
-          ) : (
-            <ToolGrid
-              sections={sections}
-              currentLetter={currentLetter}
-              hoveredId={hoveredId}
-              hasSpotlight={hasSpotlight}
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
+        <div className="layout">
+          <aside className="layout-sidebar">
+            <CategoryNav
+              categories={categories}
+              activeCategory={activeCategory}
+              onSelectCategory={selectCategory}
+              totalTools={allTools.length}
             />
-          )}
+          </aside>
 
-          <Footer
-            totalTools={allTools.length}
-            totalCategories={categories.length}
-            source={catalog.source || "spreadsheet"}
-          />
-        </main>
+          <main className="layout-main" id="tools-directory">
+            <div className="toolbar">
+              <SearchBar query={query} setQuery={setQuery} />
+              <SortSelect value={sortId} onChange={setSortId} />
+            </div>
 
-        <AlphabetRail
-          sections={sections}
-          currentLetter={currentLetter}
-          onSelectLetter={(letterKey) => scrollToId(`letter-${letterKey}`)}
-        />
+            <div className="results-bar" aria-live="polite">
+              <span className="results-count" data-testid="results-count">
+                <strong>{filteredTools.length}</strong> {filteredTools.length === 1 ? "tool" : "tools"}
+                {activeCategoryMeta ? ` in ${activeCategoryMeta.name}` : ""}
+                {query.trim() ? ` matching “${query.trim()}”` : ""}
+              </span>
+              <span className="results-sort">Sorted by {sortLabel}</span>
+            </div>
+
+            {filteredTools.length === 0 ? (
+              <EmptyState query={query} onReset={reset} />
+            ) : (
+              <div className="tools-grid">
+                {filteredTools.map((tool) => (
+                  <ToolCard
+                    key={`${tool.index}-${tool.id}`}
+                    tool={tool}
+                    domId={`tool-${tool.index}`}
+                    isHovered={hoveredId === tool.index}
+                    onMouseEnter={(e) => handleMouseEnter(tool.index, e)}
+                    onMouseLeave={handleMouseLeave}
+                    onFocus={() => handleFocus(tool.index)}
+                    onBlur={handleBlur}
+                  />
+                ))}
+              </div>
+            )}
+          </main>
+        </div>
+
+        <Footer totalTools={allTools.length} totalCategories={categories.length} source={catalog.source || "spreadsheet"} />
       </div>
     </ErrorBoundary>
   );

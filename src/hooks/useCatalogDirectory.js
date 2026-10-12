@@ -1,26 +1,32 @@
 import { useEffect, useMemo, useState } from "react";
-import { compareNames, sectionKey } from "../utils/formatters.js";
+import { compareNames } from "../utils/formatters.js";
 import { hostFromUrl, safeHttpUrl } from "../utils/url.js";
+import { DEFAULT_SORT, isSortId, sortTools } from "../utils/sort.js";
+
+function readSortFromUrl() {
+  if (typeof window === "undefined") return DEFAULT_SORT;
+  const value = new URLSearchParams(window.location.search).get("sort");
+  return isSortId(value) ? value : DEFAULT_SORT;
+}
 
 /**
- * Custom hook for directory filtering, search querying, and categorization.
+ * Filtering (category + search) and sorting for the directory.
+ * Category is kept in the URL hash and the sort in ?sort= so views are shareable.
  *
  * @param {object|null} catalog
  */
 export function useCatalogDirectory(catalog) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [sortId, setSortIdState] = useState(readSortFromUrl);
 
-  // Synchronize category with URL hash
   useEffect(() => {
     if (!catalog?.groups) return undefined;
-
     const handleHash = () => {
-      const hash = window.location.hash.replace(/^#/, "");
+      const hash = decodeURIComponent(window.location.hash.replace(/^#/, ""));
       const isKnown = catalog.groups.some((group) => group.category.id === hash);
       setActiveCategory(isKnown ? hash : "all");
     };
-
     handleHash();
     window.addEventListener("hashchange", handleHash);
     return () => window.removeEventListener("hashchange", handleHash);
@@ -29,15 +35,20 @@ export function useCatalogDirectory(catalog) {
   const selectCategory = (catId) => {
     const next = catId || "all";
     setActiveCategory(next);
-    if (next === "all") {
-      const path = window.location.pathname + window.location.search;
-      window.history.pushState(null, "", path);
-    } else {
-      window.location.hash = next;
-    }
+    const base = window.location.pathname + window.location.search;
+    window.history.replaceState(null, "", next === "all" ? base : `${base}#${encodeURIComponent(next)}`);
   };
 
-  // Normalized list of categories with tool counts
+  const setSortId = (id) => {
+    const next = isSortId(id) ? id : DEFAULT_SORT;
+    setSortIdState(next);
+    const params = new URLSearchParams(window.location.search);
+    if (next === DEFAULT_SORT) params.delete("sort");
+    else params.set("sort", next);
+    const qs = params.toString();
+    window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}${window.location.hash}`);
+  };
+
   const categories = useMemo(() => {
     if (!catalog?.groups) return [];
     return catalog.groups
@@ -50,7 +61,6 @@ export function useCatalogDirectory(catalog) {
       .sort((a, b) => compareNames(a.name, b.name));
   }, [catalog]);
 
-  // Flattened and normalized tool list
   const allTools = useMemo(() => {
     if (!catalog?.groups) return [];
     const list = [];
@@ -63,62 +73,24 @@ export function useCatalogDirectory(catalog) {
           href,
           host: tool.host || (href ? hostFromUrl(href) : ""),
           added: tool.added || "",
+          github: tool.github || "",
         });
       }
     }
-    list.sort((a, b) => compareNames(a.name, b.name) || a.index - b.index);
     return list;
   }, [catalog]);
 
   const sanitizedQuery = query.trim().toLowerCase();
 
-  // Filtered tools based on active category and search query
   const filteredTools = useMemo(() => {
-    return allTools.filter((tool) => {
-      if (activeCategory !== "all" && tool.category !== activeCategory) {
-        return false;
-      }
+    const matches = allTools.filter((tool) => {
+      if (activeCategory !== "all" && tool.category !== activeCategory) return false;
       if (!sanitizedQuery) return true;
-      const haystack = `${tool.name} ${tool.description} ${tool.host} ${tool.categoryName}`.toLowerCase();
+      const haystack = `${tool.name} ${tool.description} ${tool.host} ${tool.categoryName} ${tool.source}`.toLowerCase();
       return haystack.includes(sanitizedQuery);
     });
-  }, [allTools, activeCategory, sanitizedQuery]);
-
-  // Extract recently added tools (if dated)
-  const recent = useMemo(() => {
-    const dated = allTools.filter((tool) => tool.added);
-    if (!dated.length) return { date: "", tools: [] };
-
-    const newest = dated.reduce((max, tool) => (tool.added > max ? tool.added : max), "");
-    if (!dated.some((tool) => tool.added < newest)) return { date: "", tools: [] };
-
-    const tools = dated
-      .filter((tool) => tool.added === newest)
-      .filter((tool) => activeCategory === "all" || tool.category === activeCategory)
-      .filter((tool) => {
-        if (!sanitizedQuery) return true;
-        const haystack = `${tool.name} ${tool.description} ${tool.host} ${tool.categoryName}`.toLowerCase();
-        return haystack.includes(sanitizedQuery);
-      })
-      .sort((a, b) => compareNames(a.name, b.name) || a.index - b.index);
-
-    return { date: newest, tools };
-  }, [allTools, activeCategory, sanitizedQuery]);
-
-  // Group filtered tools alphabetically into letter sections
-  const sections = useMemo(() => {
-    const grouped = [];
-    for (const tool of filteredTools) {
-      const key = sectionKey(tool.name);
-      const last = grouped[grouped.length - 1];
-      if (!last || last.key !== key) {
-        grouped.push({ key, tools: [tool] });
-      } else {
-        last.tools.push(tool);
-      }
-    }
-    return grouped;
-  }, [filteredTools]);
+    return sortTools(matches, sortId);
+  }, [allTools, activeCategory, sanitizedQuery, sortId]);
 
   const activeCategoryMeta = categories.find((c) => c.id === activeCategory);
 
@@ -127,11 +99,11 @@ export function useCatalogDirectory(catalog) {
     setQuery,
     activeCategory,
     selectCategory,
+    sortId,
+    setSortId,
     categories,
     activeCategoryMeta,
     allTools,
     filteredTools,
-    recent,
-    sections,
   };
 }

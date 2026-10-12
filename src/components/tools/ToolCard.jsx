@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, ImageOff } from "lucide-react";
 import { SheetIcon } from "../common/SheetIcon.jsx";
+import { formatSheetDate } from "../../utils/formatters.js";
 
 /**
  * @param {{
@@ -111,31 +112,27 @@ function ToolCardComponent({
     <div className="tool-card-inner">
       <div className="tool-card-head">
         <div className="tool-avatar-shell">
-          <SheetIcon name={tool.icon} size={20} />
+          <SheetIcon name={tool.icon} size={18} />
         </div>
-
         <div className="tool-meta-block">
-          <div className="tool-title-row">
-            <h3 className="tool-name">{tool.name}</h3>
-            {tool.categoryName && (
-              <span className="tool-category-badge">{tool.categoryName}</span>
-            )}
-          </div>
-          {tool.host && (
-            <span className="tool-host-label">{tool.host}</span>
-          )}
+          <h3 className="tool-name">{tool.name}</h3>
+          {tool.host && <span className="tool-host-label">{tool.host}</span>}
         </div>
-
         {tool.href && (
-          <div className="tool-action-circle" aria-hidden="true">
-            <ArrowUpRight size={15} className="tool-action-arrow" />
-          </div>
+          <span className="tool-action-circle" aria-hidden="true">
+            <ArrowUpRight size={15} />
+          </span>
         )}
       </div>
 
-      {tool.description && (
-        <p className="tool-card-description">{tool.description}</p>
-      )}
+      {tool.description && <p className="tool-card-description">{tool.description}</p>}
+
+      <div className="tool-card-foot">
+        {tool.categoryName && <span className="tool-tag">{tool.categoryName}</span>}
+        {tool.source && <span className="tool-tag is-muted" title="Where this tool was found">via {tool.source}</span>}
+        {tool.github && <span className="tool-tag is-github" title="Has a GitHub repository">GitHub repo</span>}
+        {tool.added && <time className="tool-date" dateTime={tool.added}>{formatSheetDate(tool.added)}</time>}
+      </div>
 
       {tool.href && <span className="sr-only">Opens external website for {tool.name} in a new tab</span>}
     </div>
