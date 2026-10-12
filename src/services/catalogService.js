@@ -2,7 +2,7 @@ import { ENV } from "../config/env.js";
 import { SITE_CONFIG } from "../config/site.js";
 import { parseCsv, rowsToObjects } from "../utils/csvParser.js";
 import { validateIsoDate } from "../utils/formatters.js";
-import { hostFromUrl } from "../utils/url.js";
+import { hostFromUrl, safeHttpUrl } from "../utils/url.js";
 
 /**
  * Builds the Google Sheet CSV export URL.
@@ -129,6 +129,10 @@ export async function loadCatalogFromSpreadsheet() {
         category: groupKey,
         icon: (row.icon || "").trim(),
         added: validateIsoDate(row.date_added || ""),
+        source: (row.source || "").trim(),
+        sourceUrl: safeHttpUrl(row.source_url || "") || "",
+        sourceScreenshot: safeHttpUrl(row.source_screenshot_url || "") || "",
+        sourceNote: (row.source_note || "").trim(),
         index,
       });
     }

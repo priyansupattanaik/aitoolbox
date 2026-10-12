@@ -1,15 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import fallbackCatalog from "../data/catalog.json";
 import { loadCatalogFromSpreadsheet } from "../services/catalogService.js";
 
 /**
- * Custom hook to manage the catalog lifecycle with offline fallback and leak protection.
+ * Loads the catalog from the Google Sheet. The sheet is the only data source:
+ * there is no bundled fallback, so a failed fetch surfaces an error with retry.
  *
  * @returns {{
  *   catalog: object|null,
  *   loading: boolean,
  *   error: string|null,
- *   isFallback: boolean,
  *   reloadCatalog: () => Promise<void>
  * }}
  */
@@ -17,7 +16,6 @@ export function useCatalog() {
   const [catalog, setCatalog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isFallback, setIsFallback] = useState(false);
   const mountedRef = useRef(true);
 
   const fetchCatalog = useCallback(async () => {
@@ -31,18 +29,15 @@ export function useCatalog() {
 
       if (liveData && liveData.groups && liveData.groups.length > 0) {
         setCatalog(liveData);
-        setIsFallback(false);
       } else {
-        console.info("[useCatalog] Live spreadsheet unavailable, using local catalog fallback.");
-        setCatalog({ ...fallbackCatalog, source: "saved" });
-        setIsFallback(true);
+        setCatalog(null);
+        setError("Could not load the catalog from Google Sheets.");
       }
     } catch (err) {
       if (!mountedRef.current) return;
       console.error("[useCatalog] Error loading catalog:", err);
-      setError(err instanceof Error ? err.message : "Failed to load catalog");
-      setCatalog({ ...fallbackCatalog, source: "saved" });
-      setIsFallback(true);
+      setCatalog(null);
+      setError(err instanceof Error ? err.message : "Could not load the catalog from Google Sheets.");
     } finally {
       if (mountedRef.current) {
         setLoading(false);
@@ -63,7 +58,6 @@ export function useCatalog() {
     catalog,
     loading,
     error,
-    isFallback,
     reloadCatalog: fetchCatalog,
   };
 }

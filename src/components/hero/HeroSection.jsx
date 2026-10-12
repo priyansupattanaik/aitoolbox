@@ -1,19 +1,16 @@
 import React from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { Sparkles, AlertTriangle, RefreshCw } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { SearchBar } from "./SearchBar.jsx";
 
 /**
  * @param {{
  *   query: string,
  *   setQuery: (q: string) => void,
- *   isFallback: boolean,
  *   totalTools: number,
- *   error?: string|null,
- *   onRetry: () => void
  * }} props
  */
-export function HeroSection({ query, setQuery, isFallback, totalTools, error, onRetry }) {
+export function HeroSection({ query, setQuery, totalTools }) {
   const reduceMotion = useReducedMotion();
 
   return (
@@ -46,27 +43,6 @@ export function HeroSection({ query, setQuery, isFallback, totalTools, error, on
         A precision index of artificial intelligence platforms, developer utilities, and generative models, synchronized live from the catalog spreadsheet.
       </motion.p>
 
-      {isFallback && (
-        <motion.div
-          className="fallback-alert-banner"
-          role="status"
-          initial={reduceMotion ? false : { opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-        >
-          <div className="alert-content">
-            <AlertTriangle size={16} className="alert-icon" aria-hidden="true" />
-            <span>
-              {error
-                ? `Sync notice: ${error}. Showing verified offline catalog.`
-                : "Operating in cached fallback mode. Google Sheets sync is currently offline."}
-            </span>
-          </div>
-          <button type="button" className="retry-btn" onClick={onRetry} aria-label="Retry live sync">
-            <RefreshCw size={13} aria-hidden="true" />
-            <span>Retry Sync</span>
-          </button>
-        </motion.div>
-      )}
 
       <motion.div
         className="hero-search-wrapper"

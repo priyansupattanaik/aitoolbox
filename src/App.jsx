@@ -13,13 +13,14 @@ import { ToolGrid } from "./components/tools/ToolGrid.jsx";
 import { AlphabetRail } from "./components/tools/AlphabetRail.jsx";
 import { LoadingView } from "./components/common/LoadingView.jsx";
 import { EmptyState } from "./components/common/EmptyState.jsx";
+import { CatalogError } from "./components/common/CatalogError.jsx";
 import { ErrorBoundary } from "./components/common/ErrorBoundary.jsx";
 
 export default function App() {
   const reduceMotion = useReducedMotion();
   const { scrollToY, scrollToId } = useSmoothScroll(reduceMotion);
 
-  const { catalog, loading, error, isFallback, reloadCatalog } = useCatalog();
+  const { catalog, loading, error, reloadCatalog } = useCatalog();
 
   const {
     query,
@@ -90,8 +91,12 @@ export default function App() {
     scrollToY(0);
   };
 
-  if (loading || !catalog) {
+  if (loading) {
     return <LoadingView />;
+  }
+
+  if (!catalog) {
+    return <CatalogError message={error} onRetry={reloadCatalog} />;
   }
 
   return (
@@ -106,7 +111,6 @@ export default function App() {
 
         <Navbar
           totalTools={allTools.length}
-          isFallback={isFallback}
           onBrandClick={handleResetFilters}
         />
 
@@ -114,10 +118,7 @@ export default function App() {
           <HeroSection
             query={query}
             setQuery={setQuery}
-            isFallback={isFallback}
             totalTools={allTools.length}
-            error={error}
-            onRetry={reloadCatalog}
           />
 
           <CategoryChips

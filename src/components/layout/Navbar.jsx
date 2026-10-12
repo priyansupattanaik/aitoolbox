@@ -23,11 +23,10 @@ function GithubIcon({ size = 18 }) {
 /**
  * @param {{
  *   totalTools: number,
- *   isFallback: boolean,
  *   onBrandClick: () => void
  * }} props
  */
-export function Navbar({ totalTools, isFallback, onBrandClick }) {
+export function Navbar({ totalTools, onBrandClick }) {
   const reduceMotion = useReducedMotion();
 
   return (
@@ -54,9 +53,9 @@ export function Navbar({ totalTools, isFallback, onBrandClick }) {
         </a>
 
         <div className="nav-center-status">
-          <span className={`status-dot ${isFallback ? "is-warning" : "is-live"}`} />
+          <span className={"status-dot is-live"} />
           <span className="status-label">
-            {isFallback ? "Offline Catalog" : `${totalTools} Tools Live`}
+            {`${totalTools} Tools Live`}
           </span>
         </div>
 
