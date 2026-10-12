@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local env, deploy state, agent scratch
+.env
+.env.*
+!.env.example
+.netlify
+.grok
+*.map

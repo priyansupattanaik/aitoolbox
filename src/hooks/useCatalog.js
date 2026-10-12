@@ -35,7 +35,7 @@ export function useCatalog() {
       }
     } catch (err) {
       if (!mountedRef.current) return;
-      console.error("[useCatalog] Error loading catalog:", err);
+
       setCatalog(null);
       setError(err instanceof Error ? err.message : "Could not load the catalog from Google Sheets.");
     } finally {
