@@ -175,7 +175,7 @@ const html = `<!DOCTYPE html>
   <meta name="description" content="${esc(description)}">
   <meta name="author" content="${esc(site.author)}">
   <meta name="robots" content="index, follow">
-  <meta name="theme-color" content="#050505">
+  <meta name="theme-color" content="#000000">
   <meta property="og:title" content="${esc(site.title)}">
   <meta property="og:description" content="${esc(description)}">
   <meta property="og:type" content="website">
@@ -184,6 +184,9 @@ const html = `<!DOCTYPE html>
   <meta name="twitter:title" content="${esc(site.title)}">
   <meta name="twitter:description" content="${esc(description)}">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script type="application/ld+json">${jsonLd}</script>
 </head>
 <body>
