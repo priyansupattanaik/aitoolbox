@@ -170,6 +170,8 @@ assert.strictEqual(msgs.length, 2);
 assert.strictEqual(msgs[0].role, "system");
 assert.strictEqual(msgs[0].content, SYSTEM_PROMPT);
 assert(/same language/i.test(SYSTEM_PROMPT) && /never invent/i.test(SYSTEM_PROMPT) && /JSON only/i.test(SYSTEM_PROMPT));
+assert(/fewer than 3/.test(SYSTEM_PROMPT) && /most directly/.test(SYSTEM_PROMPT));
+assert(/Hinglish/.test(SYSTEM_PROMPT) && /usual script/.test(SYSTEM_PROMPT));
 assert(msgs[1].content.includes("<<<\nquiero editar videos\n>>>"));
 assert(msgs[1].content.includes(compact.text));
 assert(MAX_CATALOG_CHARS <= 60000);
