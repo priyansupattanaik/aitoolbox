@@ -53,7 +53,13 @@ export function formatSheetDate(iso) {
  * @returns {number}
  */
 export function compareNames(a = "", b = "") {
-  return String(a).localeCompare(String(b), "en", NAME_SORT_OPTIONS);
+  return nameSortKey(a).localeCompare(nameSortKey(b), "en", NAME_SORT_OPTIONS);
+}
+
+/** Ignores leading punctuation such as "/" or "@" so "/awwwards" sorts under A. */
+function nameSortKey(value) {
+  const text = String(value ?? "").trim();
+  return text.replace(/^[^\p{L}\p{N}]+/u, "") || text;
 }
 
 /**

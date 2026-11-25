@@ -3,9 +3,9 @@ import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { parseCsv, rowsToObjects } from "../src/utils/csvParser.js";
 import { safeHttpUrl, hostFromUrl } from "../src/utils/url.js";
-import { validateIsoDate, formatSheetDate, sectionKey } from "../src/utils/formatters.js";
+import { validateIsoDate, formatSheetDate, sectionKey, compareNames } from "../src/utils/formatters.js";
 import { resolveIcon } from "../src/utils/icons.js";
-import { buildCatalog, csvTextToRows, loadCatalogFromSheet, DEFAULT_SHEET, sheetConfigFromEnv } from "../src/shared/catalogCore.js";
+import { buildCatalog, csvTextToRows, loadCatalogFromSheet, DEFAULT_SHEET, sheetConfigFromEnv, humanizeCategoryId } from "../src/shared/catalogCore.js";
 import { sortTools, SORT_OPTIONS, isSortId } from "../src/utils/sort.js";
 import handler from "../netlify/functions/catalog.mjs";
 
@@ -66,6 +66,17 @@ assert.strictEqual(built.groups[1].category.name, "Uncategorized");
 assert(!JSON.stringify(built).includes("SHOULD_NOT_LEAK"), "internal columns must be dropped");
 assert.deepStrictEqual(Object.keys(alpha).sort(), ["added","category","description","github","host","icon","id","index","name","source","sourceNote","sourceScreenshot","sourceUrl","url"]);
 assert.strictEqual(buildCatalog([], []), null);
+const extra = buildCatalog(csvTextToRows(`id,name,url,category,date_added
+p,Placeholder,https://p.dev,agent-tools,2025-01-01
+r,Real,https://r.dev,ai,2026-11-15
+`), csvTextToRows(catsCsv));
+assert.strictEqual(extra.groups[0].tools[0].added, "", "placeholder date must be treated as unknown");
+assert.strictEqual(extra.groups[0].category.name, "Agent Tools");
+assert.strictEqual(extra.groups[1].category.name, "AI");
+assert.strictEqual(extra.groups[1].tools[0].added, "2026-11-15");
+assert.strictEqual(humanizeCategoryId(""), "Uncategorized");
+assert(compareNames("/awwwards", "Bolt") < 0, "leading punctuation is ignored when sorting names");
+assert(compareNames("@scope/zed", "Alpha") > 0);
 assert.strictEqual(sheetConfigFromEnv({}).sheetId, DEFAULT_SHEET.sheetId);
 assert.strictEqual(sheetConfigFromEnv({ SHEET_ID: "abc" }).sheetId, "abc");
 

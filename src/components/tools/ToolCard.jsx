@@ -24,9 +24,9 @@ import { formatSheetDate } from "../../utils/formatters.js";
  *   domId?: string,
  *   isHovered?: boolean,
  *   isDimmed?: boolean,
- *   onMouseEnter?: (e: React.PointerEvent) => void,
+ *   onMouseEnter?: (index: number, e: React.PointerEvent) => void,
  *   onMouseLeave?: (e: React.PointerEvent) => void,
- *   onFocus?: () => void,
+ *   onFocus?: (index: number) => void,
  *   onBlur?: () => void
  * }} props
  */
@@ -171,9 +171,9 @@ function ToolCardComponent({
     <div
       ref={wrapRef}
       className={`tool-card-wrap${showPreview ? " has-preview" : ""}`}
-      onPointerEnter={onMouseEnter}
+      onPointerEnter={(event) => onMouseEnter?.(tool.index, event)}
       onPointerLeave={onMouseLeave}
-      onFocus={onFocus}
+      onFocus={() => onFocus?.(tool.index)}
       onBlur={handleBlur}
     >
       {renderCard()}

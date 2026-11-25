@@ -50,6 +50,26 @@ export async function fetchSheetRows(sheetId, gid, { fetchImpl = fetch, timeoutM
 const clean = (value) => String(value || "").trim();
 
 /**
+ * Dates the sheet uses as a stand-in when the real date a tool was added is unknown.
+ * They are treated as "no date" so they are not shown or sorted as real dates.
+ */
+export const PLACEHOLDER_DATES = new Set(["2025-01-01"]);
+
+function addedDate(value) {
+  const iso = validateIsoDate(clean(value));
+  return PLACEHOLDER_DATES.has(iso) ? "" : iso;
+}
+
+/** Readable name for a category id that has no row in the Categories tab, e.g. "agent-tools" -> "Agent Tools". */
+export function humanizeCategoryId(id) {
+  const words = clean(id).split(/[-_\s]+/).filter(Boolean);
+  if (!words.length) return "Uncategorized";
+  return words
+    .map((w) => (w.length <= 2 ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1)))
+    .join(" ");
+}
+
+/**
  * Turns sheet rows into the public catalog. Only fields the UI renders are kept;
  * every URL is restricted to http/https.
  */
@@ -76,7 +96,7 @@ export function buildCatalog(toolRows, catRows) {
       const group = {
         category: known
           ? { ...known }
-          : { id: groupKey, name: categoryId || "Uncategorized", description: "" },
+          : { id: groupKey, name: humanizeCategoryId(categoryId), description: "" },
         tools: [],
       };
       groupById.set(groupKey, group);
@@ -94,7 +114,7 @@ export function buildCatalog(toolRows, catRows) {
       category: groupKey,
       icon: clean(row.icon),
       github: safeHttpUrl(row.github) || "",
-      added: validateIsoDate(clean(row.date_added)),
+      added: addedDate(row.date_added),
       source: clean(row.source),
       sourceUrl: safeHttpUrl(row.source_url) || "",
       sourceScreenshot: safeHttpUrl(row.source_screenshot_url) || "",

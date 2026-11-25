@@ -79,9 +79,9 @@ export default function App() {
                     tool={tool}
                     domId={`tool-${tool.index}`}
                     isHovered={hoveredId === tool.index}
-                    onMouseEnter={(e) => handleMouseEnter(tool.index, e)}
+                    onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
-                    onFocus={() => handleFocus(tool.index)}
+                    onFocus={handleFocus}
                     onBlur={handleBlur}
                   />
                 ))}
