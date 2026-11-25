@@ -73,9 +73,21 @@ export default async (request, context) => {
   if (!tools?.length) return json(502, { error: FAILED });
 
   const model = evalModel || (process.env.NIM_MODEL || "").trim() || DEFAULT_NIM_MODEL;
-  const compact = buildCompactCatalog(tools, q.query);
-  const result = await callNim({ apiKey, model, messages: buildMessages(q.query, compact.text) });
-  const evalMeta = evalModel ? { model, upstreamStatus: result.status, ms: result.ms, included: compact.included } : undefined; // TEMP-MODEL-EVAL
+  // TEMP-MODEL-EVAL knobs (bounded), only with an allow-listed eval model.
+  const eo = evalModel && body.evalOpts && typeof body.evalOpts === "object" ? body.evalOpts : {};
+  const maxChars = Number.isInteger(eo.maxChars) && eo.maxChars >= 8000 && eo.maxChars <= 42000 ? eo.maxChars : undefined;
+  const extraBody = {};
+  if (eo.thinkingOff === true) extraBody.chat_template_kwargs = { enable_thinking: false, thinking: false };
+  if (Number.isInteger(eo.maxTokens) && eo.maxTokens >= 200 && eo.maxTokens <= 4000) extraBody.max_tokens = eo.maxTokens;
+  if (eo.temperature === 1) extraBody.temperature = 1;
+  if (eo.noTopP === true) extraBody.top_p = undefined;
+  if (eo.jsonMode === true) extraBody.response_format = { type: "json_object" };
+  const compact = buildCompactCatalog(tools, q.query, maxChars ? { maxChars } : undefined);
+  const result = await callNim({
+    apiKey, model, messages: buildMessages(q.query, compact.text),
+    extraBody, debug: Boolean(evalModel), timeoutMs: evalModel ? 24000 : 20000,
+  });
+  const evalMeta = evalModel ? { model, upstreamStatus: result.status, ms: result.ms, included: compact.included, chars: compact.text.length, detail: result.detail, info: result.info } : undefined; // TEMP-MODEL-EVAL
 
   if (!result.ok) {
     console.error(`recommend: upstream status ${result.status} after ${result.ms}ms`);

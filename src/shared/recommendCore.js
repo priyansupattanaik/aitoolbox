@@ -255,7 +255,7 @@ export function createRateLimiter({ limit = 6, windowMs = 60000, maxKeys = 5000 
  * Calls NVIDIA NIM. Returns { ok, content, status, ms }. Never returns the upstream
  * error body; callers only see a status code.
  */
-export async function callNim({ apiKey, model, messages, timeoutMs = 20000, fetchImpl = fetch }) {
+export async function callNim({ apiKey, model, messages, timeoutMs = 20000, fetchImpl = fetch, extraBody = {}, debug = false }) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   const started = Date.now();
@@ -264,13 +264,19 @@ export async function callNim({ apiKey, model, messages, timeoutMs = 20000, fetc
       method: "POST",
       signal: controller.signal,
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({ model, messages, temperature: 0.2, top_p: 0.9, max_tokens: 1500, stream: false }),
+      body: JSON.stringify({ model, messages, temperature: 0.2, top_p: 0.9, max_tokens: 1500, stream: false, ...extraBody }),
     });
-    if (!res.ok) return { ok: false, status: res.status, ms: Date.now() - started };
+    if (!res.ok) {
+      const detail = debug ? (await res.text()).slice(0, 300) : undefined;
+      return { ok: false, status: res.status, ms: Date.now() - started, detail };
+    }
     const data = await res.json();
     const msg = data?.choices?.[0]?.message || {};
     const content = typeof msg.content === "string" && msg.content.trim() ? msg.content : "";
-    return { ok: true, status: res.status, content, ms: Date.now() - started };
+    const info = debug
+      ? { finish: data?.choices?.[0]?.finish_reason, usage: data?.usage, contentHead: String(msg.content || "").slice(0, 200), reasoningLen: String(msg.reasoning_content || msg.reasoning || "").length }
+      : undefined;
+    return { ok: true, status: res.status, content, ms: Date.now() - started, info };
   } catch (err) {
     return { ok: false, status: err?.name === "AbortError" ? 504 : 502, ms: Date.now() - started };
   } finally {
