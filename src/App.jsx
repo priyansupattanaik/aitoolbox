@@ -5,6 +5,7 @@ import { useSpotlightHover } from "./hooks/useSpotlightHover.js";
 import { Header } from "./components/layout/Header.jsx";
 import { Footer } from "./components/layout/Footer.jsx";
 import { SearchBar } from "./components/hero/SearchBar.jsx";
+import { AskAI } from "./components/hero/AskAI.jsx";
 import { CategoryNav } from "./components/filters/CategoryNav.jsx";
 import { SortSelect } from "./components/filters/SortSelect.jsx";
 import { ToolCard } from "./components/tools/ToolCard.jsx";
@@ -55,6 +56,8 @@ export default function App() {
           </aside>
 
           <main className="layout-main" id="tools-directory">
+            <AskAI tools={allTools} />
+
             <div className="toolbar">
               <SearchBar query={query} setQuery={setQuery} />
               <SortSelect value={sortId} onChange={setSortId} />

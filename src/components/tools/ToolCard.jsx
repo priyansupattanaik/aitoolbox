@@ -22,6 +22,7 @@ import { formatSheetDate } from "../../utils/formatters.js";
  *     index?: number
  *   },
  *   domId?: string,
+ *   reason?: string,
  *   isHovered?: boolean,
  *   isDimmed?: boolean,
  *   onMouseEnter?: (index: number, e: React.PointerEvent) => void,
@@ -101,6 +102,7 @@ function SourcePreview({ tool, side, previewId }) {
 function ToolCardComponent({
   tool,
   domId,
+  reason,
   isHovered = false,
   isDimmed = false,
   onMouseEnter,
@@ -126,6 +128,13 @@ function ToolCardComponent({
       </div>
 
       {tool.description && <p className="tool-card-description">{tool.description}</p>}
+
+      {reason && (
+        <p className="tool-card-reason">
+          <span className="sr-only">Why it fits: </span>
+          {reason}
+        </p>
+      )}
 
       <div className="tool-card-foot">
         {tool.categoryName && <span className="tool-tag">{tool.categoryName}</span>}
