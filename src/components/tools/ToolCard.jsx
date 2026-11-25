@@ -1,116 +1,37 @@
-import React, { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, ImageOff } from "lucide-react";
+import React from "react";
+import { ArrowUpRight } from "lucide-react";
 import { SheetIcon } from "../common/SheetIcon.jsx";
 import { formatSheetDate } from "../../utils/formatters.js";
+import { cardSummary } from "../../utils/summary.js";
 
 /**
+ * One tool in the directory. The description is a single short line
+ * (the sheet's short_description, falling back to the full description).
+ *
  * @param {{
  *   tool: {
  *     id: string,
  *     name: string,
+ *     shortDescription?: string,
  *     description?: string,
- *     url?: string,
  *     href?: string|null,
  *     host?: string,
  *     categoryName?: string,
  *     icon?: string,
  *     added?: string,
  *     source?: string,
- *     sourceUrl?: string,
- *     sourceScreenshot?: string,
- *     sourceNote?: string,
+ *     github?: string,
  *     index?: number
  *   },
  *   domId?: string,
- *   reason?: string,
- *   isHovered?: boolean,
- *   isDimmed?: boolean,
- *   onMouseEnter?: (index: number, e: React.PointerEvent) => void,
- *   onMouseLeave?: (e: React.PointerEvent) => void,
- *   onFocus?: (index: number) => void,
- *   onBlur?: () => void
+ *   reason?: string
  * }} props
  */
-const FINE_POINTER_QUERY = "(hover: hover) and (pointer: fine)";
-const PREVIEW_WIDTH = 320;
+function ToolCardComponent({ tool, domId, reason }) {
+  const summary = cardSummary(tool);
+  const elementId = domId || `tool-${tool.id}`;
 
-function useFinePointer() {
-  const [fine, setFine] = useState(
-    () => typeof window !== "undefined" && !!window.matchMedia && window.matchMedia(FINE_POINTER_QUERY).matches
-  );
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return undefined;
-    const mql = window.matchMedia(FINE_POINTER_QUERY);
-    const onChange = () => setFine(mql.matches);
-    mql.addEventListener?.("change", onChange);
-    return () => mql.removeEventListener?.("change", onChange);
-  }, []);
-  return fine;
-}
-
-/**
- * Preview of where a tool was found: screenshot, platform label and a link
- * to the source page. Every value comes from the sheet row.
- */
-function SourcePreview({ tool, side, previewId }) {
-  const [failed, setFailed] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const label = tool.source || "Source";
-
-  return (
-    <aside
-      id={previewId}
-      className={`tool-source-preview is-${side}`}
-      aria-label={`Where ${tool.name} was found`}
-    >
-      <div className="tool-source-shot">
-        {tool.sourceScreenshot && !failed ? (
-          <img
-            src={tool.sourceScreenshot}
-            alt={`Screenshot of the ${label} page where ${tool.name} was found`}
-            loading="lazy"
-            decoding="async"
-            className={loaded ? "is-loaded" : ""}
-            onLoad={() => setLoaded(true)}
-            onError={() => setFailed(true)}
-          />
-        ) : (
-          <div className="tool-source-shot-fallback">
-            <ImageOff size={20} aria-hidden="true" />
-            <span>Screenshot unavailable</span>
-          </div>
-        )}
-      </div>
-      <div className="tool-source-meta">
-        <span className="tool-category-badge">Found on {label}</span>
-        {tool.sourceUrl && (
-          <a
-            className="tool-source-link"
-            href={tool.sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View source <ArrowUpRight size={13} aria-hidden="true" />
-          </a>
-        )}
-      </div>
-      {tool.sourceNote && <p className="tool-source-note">{tool.sourceNote}</p>}
-    </aside>
-  );
-}
-
-function ToolCardComponent({
-  tool,
-  domId,
-  reason,
-  isHovered = false,
-  isDimmed = false,
-  onMouseEnter,
-  onMouseLeave,
-  onFocus,
-  onBlur,
-}) {
-  const cardContent = (
+  const content = (
     <div className="tool-card-inner">
       <div className="tool-card-head">
         <div className="tool-avatar-shell">
@@ -127,7 +48,7 @@ function ToolCardComponent({
         )}
       </div>
 
-      {tool.description && <p className="tool-card-description">{tool.description}</p>}
+      {summary && <p className="tool-card-description">{summary}</p>}
 
       {reason && (
         <p className="tool-card-reason">
@@ -138,8 +59,8 @@ function ToolCardComponent({
 
       <div className="tool-card-foot">
         {tool.categoryName && <span className="tool-tag">{tool.categoryName}</span>}
-        {tool.source && <span className="tool-tag is-muted" title="Where this tool was found">via {tool.source}</span>}
-        {tool.github && <span className="tool-tag is-github" title="Has a GitHub repository">GitHub repo</span>}
+        {tool.source && <span className="tool-tag is-muted">via {tool.source}</span>}
+        {tool.github && <span className="tool-tag is-github">GitHub repo</span>}
         {tool.added && <time className="tool-date" dateTime={tool.added}>{formatSheetDate(tool.added)}</time>}
       </div>
 
@@ -147,80 +68,18 @@ function ToolCardComponent({
     </div>
   );
 
-  const cardClasses = [
-    "tool-card",
-    isHovered ? "is-focused" : "",
-    isDimmed ? "is-dimmed" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  const elementId = domId || `tool-${tool.id}`;
-  const previewId = `${elementId}-source`;
-  const wrapRef = useRef(null);
-  const finePointer = useFinePointer();
-  const [side, setSide] = useState("right");
-  const hasSource = Boolean(tool.sourceUrl || tool.sourceScreenshot);
-  const showPreview = isHovered && finePointer && hasSource;
-
-  useEffect(() => {
-    if (!showPreview || !wrapRef.current) return;
-    const rect = wrapRef.current.getBoundingClientRect();
-    const fitsRight = rect.right + 12 + PREVIEW_WIDTH <= window.innerWidth;
-    const fitsLeft = rect.left - 12 - PREVIEW_WIDTH >= 0;
-    setSide(fitsRight || !fitsLeft ? "right" : "left");
-  }, [showPreview]);
-
-  const handleBlur = (event) => {
-    if (wrapRef.current && wrapRef.current.contains(event.relatedTarget)) return;
-    onBlur?.(event);
-  };
-
-  return (
-    <div
-      ref={wrapRef}
-      className={`tool-card-wrap${showPreview ? " has-preview" : ""}`}
-      onPointerEnter={(event) => onMouseEnter?.(tool.index, event)}
-      onPointerLeave={onMouseLeave}
-      onFocus={() => onFocus?.(tool.index)}
-      onBlur={handleBlur}
-    >
-      {renderCard()}
-      {showPreview && <SourcePreview tool={tool} side={side} previewId={previewId} />}
-    </div>
-  );
-
-  function renderCard() {
   if (tool.href) {
     return (
-      <a
-        id={elementId}
-        href={tool.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={cardClasses}
-        data-focused={isHovered ? "true" : undefined}
-        data-dimmed={isDimmed ? "true" : undefined}
-        aria-describedby={showPreview ? previewId : undefined}
-      >
-        {cardContent}
+      <a id={elementId} href={tool.href} target="_blank" rel="noopener noreferrer" className="tool-card">
+        {content}
       </a>
     );
   }
-
   return (
-    <div
-      id={elementId}
-      tabIndex={0}
-      className={cardClasses}
-      data-focused={isHovered ? "true" : undefined}
-      data-dimmed={isDimmed ? "true" : undefined}
-      aria-describedby={showPreview ? previewId : undefined}
-    >
-      {cardContent}
+    <div id={elementId} className="tool-card">
+      {content}
     </div>
   );
-  }
 }
 
 export const ToolCard = React.memo(ToolCardComponent);

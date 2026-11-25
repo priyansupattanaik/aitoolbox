@@ -109,6 +109,7 @@ export function buildCatalog(toolRows, catRows) {
       id: clean(row.id) || name,
       name,
       description: clean(row.description),
+      shortDescription: clean(row.short_description),
       url,
       host: hostFromUrl(url),
       category: groupKey,
@@ -116,9 +117,6 @@ export function buildCatalog(toolRows, catRows) {
       github: safeHttpUrl(row.github) || "",
       added: addedDate(row.date_added),
       source: clean(row.source),
-      sourceUrl: safeHttpUrl(row.source_url) || "",
-      sourceScreenshot: safeHttpUrl(row.source_screenshot_url) || "",
-      sourceNote: clean(row.source_note),
       index,
     });
   }

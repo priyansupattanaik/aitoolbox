@@ -8,9 +8,9 @@ import { MAX_QUERY_CHARS, MIN_QUERY_CHARS } from "../../utils/recommendLimits.js
  * "Ask AI" box: the visitor describes a need in any language and gets 3–5
  * tools picked from this catalog, shown as regular tool cards with a reason.
  *
- * @param {{ tools: Array<{ id: string, index: number }> }} props
+ * @param {{ tools: Array<{ id: string, index: number }>, onActiveChange?: (active: boolean) => void }} props
  */
-export function AskAI({ tools }) {
+export function AskAI({ tools, onActiveChange }) {
   const [text, setText] = useState("");
   const [status, setStatus] = useState("idle"); // idle | loading | done | error
   const [error, setError] = useState("");
@@ -21,6 +21,9 @@ export function AskAI({ tools }) {
   const statusId = useId();
 
   useEffect(() => () => controllerRef.current?.abort(), []);
+  useEffect(() => {
+    onActiveChange?.(status !== "idle");
+  }, [status, onActiveChange]);
 
   const toolById = useMemo(() => new Map(tools.map((t) => [t.id, t])), [tools]);
   const results = useMemo(

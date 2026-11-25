@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { useCatalog } from "./hooks/useCatalog.js";
 import { useCatalogDirectory } from "./hooks/useCatalogDirectory.js";
-import { useSpotlightHover } from "./hooks/useSpotlightHover.js";
 import { Header } from "./components/layout/Header.jsx";
 import { Footer } from "./components/layout/Footer.jsx";
 import { SearchBar } from "./components/hero/SearchBar.jsx";
@@ -9,6 +8,7 @@ import { AskAI } from "./components/hero/AskAI.jsx";
 import { CategoryNav } from "./components/filters/CategoryNav.jsx";
 import { SortSelect } from "./components/filters/SortSelect.jsx";
 import { ToolCard } from "./components/tools/ToolCard.jsx";
+import { RecentlyAdded } from "./components/tools/RecentlyAdded.jsx";
 import { LoadingView } from "./components/common/LoadingView.jsx";
 import { EmptyState } from "./components/common/EmptyState.jsx";
 import { CatalogError } from "./components/common/CatalogError.jsx";
@@ -21,7 +21,7 @@ export default function App() {
     query, setQuery, activeCategory, selectCategory, sortId, setSortId,
     categories, activeCategoryMeta, allTools, filteredTools,
   } = useCatalogDirectory(catalog);
-  const { hoveredId, handleMouseEnter, handleMouseLeave, handleFocus, handleBlur } = useSpotlightHover();
+  const [askActive, setAskActive] = useState(false);
 
   const reset = () => {
     setQuery("");
@@ -56,7 +56,9 @@ export default function App() {
           </aside>
 
           <main className="layout-main" id="tools-directory">
-            <AskAI tools={allTools} />
+            <AskAI tools={allTools} onActiveChange={setAskActive} />
+
+            {!askActive && !query.trim() && activeCategory === "all" && <RecentlyAdded tools={allTools} />}
 
             <div className="toolbar">
               <SearchBar query={query} setQuery={setQuery} />
@@ -81,11 +83,6 @@ export default function App() {
                     key={`${tool.index}-${tool.id}`}
                     tool={tool}
                     domId={`tool-${tool.index}`}
-                    isHovered={hoveredId === tool.index}
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
                   />
                 ))}
               </div>

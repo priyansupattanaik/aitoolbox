@@ -86,7 +86,7 @@ export function useCatalogDirectory(catalog) {
     const matches = allTools.filter((tool) => {
       if (activeCategory !== "all" && tool.category !== activeCategory) return false;
       if (!sanitizedQuery) return true;
-      const haystack = `${tool.name} ${tool.description} ${tool.host} ${tool.categoryName} ${tool.source}`.toLowerCase();
+      const haystack = `${tool.name} ${tool.shortDescription || ""} ${tool.description} ${tool.host} ${tool.categoryName} ${tool.source}`.toLowerCase();
       return haystack.includes(sanitizedQuery);
     });
     return sortTools(matches, sortId);
