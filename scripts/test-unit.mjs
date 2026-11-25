@@ -173,7 +173,9 @@ assert(/same language/i.test(SYSTEM_PROMPT) && /never invent/i.test(SYSTEM_PROMP
 assert(msgs[1].content.includes("<<<\nquiero editar videos\n>>>"));
 assert(msgs[1].content.includes(compact.text));
 assert(MAX_CATALOG_CHARS <= 60000);
-assert.strictEqual(DEFAULT_NIM_MODEL.includes("llama-3.3"), false, "llama-3.3-70b reached end of life on NIM");
+assert.strictEqual(DEFAULT_NIM_MODEL, "nvidia/nemotron-3.5-super-vl-120b-a12b");
+assert(/not about finding a tool/.test(SYSTEM_PROMPT));
+assert(!readFileSync("netlify/functions/recommend.mjs", "utf8").includes("body.model"), "visitors cannot pick the model");
 
 console.log("Test 11: Recommender JSON parsing fallbacks...");
 assert.deepStrictEqual(parseModelJson('{"picks":[{"ref":1,"reason":"a"}]}'), [{ ref: 1, reason: "a" }]);
@@ -230,6 +232,7 @@ assert.strictEqual(okCall.ok, true);
 assert.strictEqual(okCall.content, '{"picks":[]}');
 assert.strictEqual(sentBody.model, "m");
 assert.strictEqual(sentBody.stream, false);
+assert.deepStrictEqual(sentBody.chat_template_kwargs, { enable_thinking: false, thinking: false });
 const errCall = await callNim({ apiKey: "k", model: "m", messages: msgs, fetchImpl: async () => new Response("secret upstream detail", { status: 401 }) });
 assert.deepStrictEqual([errCall.ok, errCall.status, errCall.content], [false, 401, undefined]);
 const slowFetch = (url, init) => new Promise((_, reject) => init.signal.addEventListener("abort", () => reject(Object.assign(new Error("aborted"), { name: "AbortError" }))));
